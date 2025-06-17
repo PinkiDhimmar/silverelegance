@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <title>Login</title>
+        <link href="/public/css/style.css" rel="stylesheet">
+        <!-- Bootstrap CSS icon link -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+        <!-- Bootstrap CSS link -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+            crossorigin="anonymous">
+    </head>
+	<body>
+        <%- include('partials/navbar1.ejs') %>
+		<div class="register-container">
+            <div class="register-box">
+			<form action="/register" method="post">
+                <h1>Register</h1>
+                <p>Complete the form below to Register</p><br>
+                <p style="font-weight: bold; text-align: left;">PERSONAL DETAILS</p>
+                <input type="text" name="name" placeholder="Full Name*" id="name" required>                
+				<input type="text" name="email" placeholder="Email*" id="email" required><br>
+                <p style="font-weight: bold; text-align: left;">DATE OF BIRTH</p>
+                <input type="date" name="dob" placeholder="Date of Birth" id="dob" required><br>
+                <p style="font-weight: bold; text-align: left;">LOCATION</p>
+                <input type="text" name="address" placeholder="Address*" id="address" required><br>
+                <p style="font-weight: bold; text-align: left;">PASSWORD</p>
+                <p style="text-align: left;">7 characters minimum, must include a capital letter, no space</p>
+				<input type="password" name="password" placeholder="Password*" id="password" required>
+                <input type="password" name="confirmPassword" placeholder="Confirm Password*" id="confirmPassword" required>
+                <input type="checkbox" name="terms" id="signup" class="terms" required>
+                <p>Agree to the <a href="/terms">Terms and Conditions</a></p>
+                <button type="submit" class="btn-register">CREATE ACCOUNT</button><br>
+                <p>Already have an account? <a href="/login">Login into your account</a></p>
+                
+            </form>
+            </div>
+		</div>
+<footer>
+    <%- include('partials/footer.ejs') %>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+</body>
+</html>

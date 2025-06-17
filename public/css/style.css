@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: poppins, sans-serif;
+}
+/*navbar*/
+.navbar-light .navbar-brand {
+    font-weight: 700;
+}
+.navbar-light .navbar-nav .nav-link {
+    font-weight: 500 !important;
+    font-size: 18px;
+}
+.bi{
+    cursor: pointer;
+    font-size: 18px;
+}
+/*slider*/
+.w-100 {
+    height: 550px !important;
+    object-fit: cover !important;
+}
+.carousel-indicators [data-bs-target] {
+    height: 30px !important;
+    
+}
+.carousel-caption {
+   left: 55% !important;
+   bottom: 15.25rem !important;
+   font: 1.5rem !important;
+   font-weight: 600 !important;
+   color: rgb(132, 19, 19) !important;
+}
+
+.slide-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    color: rgb(132, 19, 19) !important;
+}
+/*about us*/
+.hr{
+    margin: auto !important;
+    width: 150px;
+    height: 5px;
+    background-color: #b18161;
+    margin-bottom: 55px !important;
+}
+.about-text {
+    color: #b18161;
+}
+.img-fluid1 {
+    width: 100% !important;
+    height: 90vh !important;
+}
+/*products*/
+.card-img-top {
+    transform-origin: 65% 75% !important;
+    transition: transform 1s, filter .5s ease-out !important;
+    cursor: pointer;
+}
+.card-img-top:hover {
+    transform: scale(1.1) !important;
+    filter: brightness(0.8) !important;
+}
+/*footer*/
+.footer {
+    background-color: #ddd6d2;
+}
+.nav-link {
+    color: black !important;
+}
+.main-footer {
+    padding: 10px !important;
+    background-color: black !important;
+    color: white !important;
+    text-align: center !important;
+}
+/*login form*/
+
+/* Login container (after navbar) */
+.login-container {
+  padding-top: 120px; /* space below navbar */
+  display: flex;
+  justify-content: center;
+}
+
+/* Login Box */
+.login-box {
+  width: 400px;
+  padding: 40px 30px;
+  background-color: #f2f2f2;
+  border-radius: 12px;
+  
+}
+
+.login-box h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #444;
+}
+.login-box p {
+  text-align: center;
+  color: #444;
+  font-size: 14px;
+}
+.login-box input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.login-box .btn-login {
+  margin: auto;
+    width: 50%;
+  padding: 12px;
+  background-color: #B32748;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background 0.3s ease;
+    display: block;
+    text-align: center;
+    align-items: center;
+  
+}
+
+.login-box button:hover {
+  background-color: #8a5c7a;
+}
+.login-box .reg-box {
+  width: 50%;
+    display: block;
+  text-align: center;
+  align-items: center;
+  margin-top: 15px;
+  font-weight: bold;
+  border: #B32748 1px solid;
+  color: #B32748;
+  text-decoration: none;
+    padding: 12px;
+    margin: auto;
+}
+/*register container*/
+.register-container {
+  padding-top: 120px; /* space below navbar */
+  display: flex;
+  justify-content: center;
+
+}
+/* Register Box */
+.register-box {
+  width: 700px;
+  align-items: center;
+  padding: 40px 30px;
+  background-color: #f2f2f2;
+  border-radius: 12px;
+}
+.register-box h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #444;
+}
+.register-box p {
+  text-align: center;
+  color: #444;
+  font-size: 14px;
+}
+.register-box input {
+  width: 70%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+.register-box .btn-register {
+  margin: auto;
+    width: 50%;
+  padding: 12px;
+  background-color: #B32748;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background 0.3s ease;
+    display: block;
+    text-align: center;
+    align-items: center;
+}
+.register-box button:hover {
+  background-color: #8a5c7a;
+}
+.register-box .terms {
+    
+    box-sizing: border-box;
+    padding: 0;
+}
+.register-box .terms input {
+    margin-right: 10px;
+    cursor: pointer;
+}
+/* dashboard */
+.sidebar {
+  border-right: 1px solid #ddd;
+}
+.nav-link.active {
+  font-weight: bold;
+  color: #a87ca0;
+}
+.nav-link:hover {
+  background-color: #f0e6f6;
+  border-radius: 4px;
+}
