@@ -13,20 +13,23 @@
       <li class="nav-item">
         <a class="nav-link" href="#about">About Us</a>
       </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#product" id="navbarDropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Products
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="#">Rings</a>
-          <a class="dropdown-item" href="#">Necklace</a>
-          <a class="dropdown-item" href="#">Bracelets</a>
-            <a class="dropdown-item" href="#">Earrings</a>
-            <a class="dropdown-item" href="#">Pendants</a>
-            <a class="dropdown-item" href="#">Anklets</a>
-            <a class="dropdown-item" href="#">Chains</a>
-        </div>
+      <li class="nav-item">
+        <a class="nav-link" href="#product">Product</a>
       </li>
+      <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Shop
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+              <% categories.forEach(category => { %>
+                <li>
+                  <a class="dropdown-item" href="/products/<%= category.slug %>"><%= category.name %></a>
+                </li>
+              <% }) %>
+        
+              
+          </ul>
+        </li>
       <li class="nav-item active">
         <a class="nav-link" href="#">Blog </a>
       </li>

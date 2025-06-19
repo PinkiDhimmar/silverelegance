@@ -210,15 +210,8 @@
     margin-right: 10px;
     cursor: pointer;
 }
-/* dashboard */
-.sidebar {
-  border-right: 1px solid #ddd;
-}
-.nav-link.active {
-  font-weight: bold;
-  color: #a87ca0;
-}
-.nav-link:hover {
-  background-color: #f0e6f6;
-  border-radius: 4px;
-}
+/* product by category */
+.product-card img {
+      height: 250px;
+      object-fit: cover;
+    }

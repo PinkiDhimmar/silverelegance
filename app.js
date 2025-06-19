@@ -39,6 +39,30 @@ app.use('/public', express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 
+//navbar fetch data from categories table
+app.use((req, res, next) => {
+  // For example: fetch categories from DB and attach to locals
+  conn.query('SELECT name, slug FROM categories', (err, results) => {
+    if (err) return next(err);
+    res.locals.categories = results || [];
+    next();
+  });
+});
+// Route: Products by category slug
+app.get('/products/:slug', (req, res) => {
+  const slug = req.params.slug;
+
+  const sql = `SELECT products.*, categories.name AS category_name FROM products
+  				JOIN categories ON products.category_id = categories.id WHERE categories.slug = ?`;
+
+  conn.query(sql, [slug], (err, results) => {
+    if (err) throw err;
+
+    res.render('products-by-category', {categorySlug: slug, products: results
+    });
+  });
+});
+
 //This will make a GET request to the URL of your server to
 //render the 'home' view and send HTML content as response.
 app.get('/',function(req,res){
@@ -108,6 +132,19 @@ app.get('/dashboard/:id', (req, res) => {
     res.render('dashboard', { user });
   });
 });
+
+//products route by category
+app.get('/products/rings', (req, res) => {
+  const sql = `SELECT products.* FROM products JOIN categories 
+  				ON products.category_id = categories.id
+    			WHERE categories.slug = 'rings'`;
+
+  conn.query(sql, (err, results) => {
+    if (err) throw err;
+    res.render('rings', { products: results });
+  });
+});
+
 //This will be used to return to home page after the members logout.
 app.get('/logout',(req,res) => {
 	req.session.destroy();
