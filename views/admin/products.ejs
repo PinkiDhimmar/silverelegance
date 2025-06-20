@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Products - Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Include Sidebar -->
+  <%- include('../partials/admin-sidebar') %>
+
+  <!-- Main Content -->
+  <div style="margin-left: 250px; padding: 3rem; margin-top: 30px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Manage Products</h2>
+      <a href="/admin/products/add" class="btn btn-primary">Add New Product</a>
+    </div>
+
+    <% if (products && products.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price ($)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% products.forEach(product => { %>
+              <tr>
+                <td><%= product.id %></td>
+                <td><img src="/uploads/<%= product.image %>" alt="<%= product.image %>" width="70"></td>
+                <td><%= product.name %></td>
+                <td><%= product.category_name %></td>
+                <td>$ <%= product.price.toFixed(2) %></td>
+                <td>
+                  <a href="/admin/products/edit/<%= product.id %>" class="btn btn-sm btn-warning">Edit</a>
+                  <a href="/admin/products/delete/<%= product.id %>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this product?')">Delete</a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p class="text-muted">No products found.</p>
+    <% } %>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

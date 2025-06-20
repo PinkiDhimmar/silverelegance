@@ -1,6 +1,6 @@
-//Node.js cafe web application
-//Author: Chathuni Wahalathantri
-//Date created: 14 February 2024
+//Node.js silver elegance web application
+//Author: Pinki DHimmar
+//Date created: 20 June 2025
 
 //This line uses the require function to include the express module.
 var express = require('express');
@@ -11,6 +11,18 @@ var app = express();
 var session = require('express-session');
 //This line contains the configuration to connect the database.
 var conn = require('./dbConfig');
+
+// multer is used for uploaded image
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: 'uploads/', 
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
+});
+
+const upload = multer({ storage });
+//end multer
+
 var bodyParser = require('body-parser');
 
 app.use(express.urlencoded({extended: true}));
@@ -39,6 +51,10 @@ app.use('/public', express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 
+//serve and attache uplosded image like this
+app.use('/uploads', express.static('uploads'));
+
+
 //count cart items
 app.use((req, res, next) => {
   const cart = req.session.cart || [];
@@ -46,6 +62,7 @@ app.use((req, res, next) => {
   res.locals.cartCount = cartCount;
   next();
 });
+
 //navbar products fetch data from categories table
 app.use((req, res, next) => {
   // For example: fetch categories from DB and attach to locals
@@ -55,6 +72,7 @@ app.use((req, res, next) => {
     next();
   });
 });
+
 // Route: Products by category slug
 app.get('/products/:slug', (req, res) => {
   const slug = req.params.slug;
@@ -69,7 +87,7 @@ app.get('/products/:slug', (req, res) => {
     });
   });
 });
-// Product detail page by fetch product from product id
+// Product detail page -- fetch product from product id
 app.get('/product/:id', (req, res, next) => {
   const slug = req.params.id;
 
@@ -100,6 +118,8 @@ app.get('/login',function(req,res){
 app.get('/register',function(req,res){
     res.render("register",{title:'Register'});
 });
+
+//login page
 app.post('/login', function(req, res) {
 	let email = req.body.email;
 	let password = req.body.password;
@@ -145,6 +165,7 @@ app.post('/register', function(req, res) {
 		console.log("Error");
 	}
 });
+
 //dashboard route
 app.get('/dashboard/:id', (req, res) => {
 	//var id = req.session.id; // Assuming userId is stored in session after login
@@ -164,36 +185,25 @@ app.get('/cart', (req, res) => {
   const cart = req.session.cart || [];
   res.render('cart', { cart });
 });
+
 //product-by-categories (add to cart)
 app.post('/cart/add', (req, res) => {
   const { productId, name, price, quantity } = req.body;
+  const id = parseInt(productId); // Parse and validate
+  const qty = parseInt(quantity); // Parse and validate
+  const cartItem = {id, name, price: parseFloat(price), quantity: qty };
 
-  // Parse and validate
-  const id = parseInt(productId);
-  const qty = parseInt(quantity);
-  const cartItem = {
-    id,
-    name,
-    price: parseFloat(price),
-    quantity: qty
-  };
-
-  // Initialize cart
-  if (!req.session.cart) req.session.cart = [];
-
-  // Check if product is already in cart
-  const existingIndex = req.session.cart.findIndex(p => p.id === id);
+  if (!req.session.cart) req.session.cart = [];// Initialize cart
+  const existingIndex = req.session.cart.findIndex(p => p.id === id);// Check if product is already in cart
   if (existingIndex !== -1) {
-    // Update quantity
-    req.session.cart[existingIndex].quantity += qty;
+    req.session.cart[existingIndex].quantity += qty;// Update quantity
   } else {
-    // Add new item
-    req.session.cart.push(cartItem);
+    req.session.cart.push(cartItem);// Add new item
   }
-
   res.redirect('/cart');
 });
-//remove from cart
+
+//remove item from cart
 app.post('/cart/remove', (req, res) => {
   const productId = parseInt(req.body.productId);
   if (req.session.cart) {
@@ -201,6 +211,7 @@ app.post('/cart/remove', (req, res) => {
   }
   res.redirect('/cart');
 });
+
 //checkout
 app.get('/checkout', (req, res) => {
   const cart = req.session.cart || [];
@@ -217,6 +228,7 @@ app.post('/checkout', (req, res) => {
   req.session.cart = [];// Clear cart
   res.send('Order placed successfully!'); 
 });
+
 // contact us page
 app.get('/contact', (req, res) => {
   res.render('contact', { success: false });
@@ -232,6 +244,36 @@ app.post('/contact', (req, res) => {
     res.render('contact', { success: true });
   });
 });
+
+// admin dashboard--- manage products
+app.get('/admin/products', (req, res) => {
+  const sql = `SELECT p.id, p.name, p.price, p.image, c.name AS category_name FROM products p
+    			LEFT JOIN categories c ON p.category_id = c.id`;
+  conn.query(sql, (err, results) => {
+    if (err) throw err;
+    res.render('admin/products', { products: results });
+  });
+});
+
+//admin dashboard----add products (submission by Multer for upload image and also (npm install multer))
+app.get('/admin/products/add', (req, res) => {
+  // Fetch categories from MySQL to populate the select dropdown
+  conn.query('SELECT * FROM categories', (err, categories) => {
+    if (err) throw err;
+    res.render('admin/add-product', { categories });
+  });
+});
+app.post('/admin/products/add', upload.single('image'), (req, res) => {
+  const { name, category_id, price } = req.body;
+  const image = req.file.filename;
+
+  const sql = 'INSERT INTO products (name, category_id, price, image) VALUES (?, ?, ?, ?)';
+  conn.query(sql, [name, category_id, price, image], (err) => {
+    if (err) throw err;
+    res.redirect('/admin/products');
+  });
+});
+
 
 //This will be used to return to home page after the members logout.
 app.get('/logout',(req,res) => {

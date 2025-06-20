@@ -2,51 +2,62 @@
   <head>
     <style>
 .sidebar {
-  border-right: 1px solid #ddd;
+  height: 100vh;
+  background-color: #f2f2f2;
+  color: #000;
+  padding-top: 1rem;
 }
-.nav-link.active {
-  font-weight: bold;
-  color: #a87ca0;
-}
-.nav-link:hover {
-  background-color: #f0e6f6;
-  border-radius: 4px;
-}
-    </style>
+.sidebar a {
+      color: #000;
+      text-decoration: none;
+      display: block;
+      padding: 10px 15px;
+    }
+.sidebar a:hover {
+      text-underline-position: below;
+      color:#B32748 ;
+    }
+.topbar {
+      position: fixed;
+      left: 250px;
+      right: 0;
+      top: 0;
+      height: 60px;
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+      z-index: 999;
+    }
+     .main {
+      margin-left: 250px;
+      padding: 2rem;
+    }
+  </style>
   </head>
-<div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar -->
-    <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar p-3 vh-100">
-      <h4 class="text-center mb-4">Silver Elegance</h4>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link active" href="/dashboard">🏠 Dashboard</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">💍 View Products</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">🛒 Customer Orders</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/admin/users">👥 Manage Users</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/admin/products">📦 Manage Products</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-danger" href="/logout">🚪 Logout</a>
-        </li>
-      </ul>
-    </nav>
-
+  <body>
+<div class="d-flex">
+  <!-- Sidebar -->
+    <div class="sidebar position-fixed p-3" style="width: 250px;">
+      <a href="/"><h4 class="text-center mb-4">Silver Elegance</h4></a>
+      <hr class="text-white">
+        <a href="/admin/dashboard" class="active">Dashboard</a>
+        <a href="/admin/products">Manage Products</a>
+        <a href="/admin/categories">Categories</a>
+        <a href="/admin/orders">Orders</a>
+        <a href="/admin/users">Users</a>
+        <a href="/logout" class="text-danger">Logout</a>
+    </div>
+    <!-- Top bar -->
+    <div class="topbar d-flex align-items-center px-4 shadow-sm">
+      <h5 class="mb-0">Welcome, admin!</h5>
+    </div>
     <!-- Main Content -->
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-      <h2>Welcome, <%= user.name %>!</h2>
-      <p>Your role is: <strong><%= user.role %></strong></p>
+   <!-- <div class="main w-100 pt-5 mt-3">
+      <h3>Dashboard Overview</h3>
+    </div>-->
+    
       <!-- Dashboard content goes here -->
-    </main>
+   
   </div>
-</div>
+
+</body>
 </html>
