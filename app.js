@@ -23,7 +23,7 @@ app.set('view engine','ejs');
 //This will set up the express application to include the session middleware.
 app.use(session({
 	secret: 'yoursecret',
-	resave: true,
+	resave: false,
 	saveUninitialized: true
 }));
 
@@ -39,7 +39,14 @@ app.use('/public', express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 
-//navbar fetch data from categories table
+//count cart items
+app.use((req, res, next) => {
+  const cart = req.session.cart || [];
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+  res.locals.cartCount = cartCount;
+  next();
+});
+//navbar products fetch data from categories table
 app.use((req, res, next) => {
   // For example: fetch categories from DB and attach to locals
   conn.query('SELECT name, slug FROM categories', (err, results) => {
@@ -62,7 +69,24 @@ app.get('/products/:slug', (req, res) => {
     });
   });
 });
+// Product detail page by fetch product from product id
+app.get('/product/:id', (req, res, next) => {
+  const slug = req.params.id;
 
+  const sql = `SELECT products.*, categories.name AS category_name FROM products
+    			JOIN categories ON products.category_id = categories.id WHERE products.id = ?`;
+
+  conn.query(sql, [slug], (err, results) => {
+    if (err) return next(err);
+
+    if (results.length === 0) {
+      return res.status(404).send('Product not found');
+    }
+
+    res.render('product-detail', {product: results[0]
+    });
+  });
+});
 //This will make a GET request to the URL of your server to
 //render the 'home' view and send HTML content as response.
 app.get('/',function(req,res){
@@ -133,15 +157,79 @@ app.get('/dashboard/:id', (req, res) => {
   });
 });
 
-//products route by category
-app.get('/products/rings', (req, res) => {
-  const sql = `SELECT products.* FROM products JOIN categories 
-  				ON products.category_id = categories.id
-    			WHERE categories.slug = 'rings'`;
 
-  conn.query(sql, (err, results) => {
+
+//view cart page
+app.get('/cart', (req, res) => {
+  const cart = req.session.cart || [];
+  res.render('cart', { cart });
+});
+//product-by-categories (add to cart)
+app.post('/cart/add', (req, res) => {
+  const { productId, name, price, quantity } = req.body;
+
+  // Parse and validate
+  const id = parseInt(productId);
+  const qty = parseInt(quantity);
+  const cartItem = {
+    id,
+    name,
+    price: parseFloat(price),
+    quantity: qty
+  };
+
+  // Initialize cart
+  if (!req.session.cart) req.session.cart = [];
+
+  // Check if product is already in cart
+  const existingIndex = req.session.cart.findIndex(p => p.id === id);
+  if (existingIndex !== -1) {
+    // Update quantity
+    req.session.cart[existingIndex].quantity += qty;
+  } else {
+    // Add new item
+    req.session.cart.push(cartItem);
+  }
+
+  res.redirect('/cart');
+});
+//remove from cart
+app.post('/cart/remove', (req, res) => {
+  const productId = parseInt(req.body.productId);
+  if (req.session.cart) {
+    req.session.cart = req.session.cart.filter(p => p.id !== productId);
+  }
+  res.redirect('/cart');
+});
+//checkout
+app.get('/checkout', (req, res) => {
+  const cart = req.session.cart || [];
+  res.render('checkout', { cart });
+});
+
+app.post('/checkout', (req, res) => {
+  const { name, address, email, payment } = req.body;
+  const cart = req.session.cart;
+
+  if (!cart || cart.length === 0) {
+    return res.redirect('/cart');
+  }
+  req.session.cart = [];// Clear cart
+  res.send('Order placed successfully!'); 
+});
+// contact us page
+app.get('/contact', (req, res) => {
+  res.render('contact', { success: false });
+});
+
+app.post('/contact', (req, res) => {
+  const { name, email, message } = req.body;
+
+  conn.query('INSERT INTO messages (name, email, message) VALUES (?, ?, ?)',
+  [name, email, message],(err) => {
     if (err) throw err;
-    res.render('rings', { products: results });
+	console.log("Contact form submitted:", { name, email, message });
+    res.render('contact', { success: true });
   });
 });
 

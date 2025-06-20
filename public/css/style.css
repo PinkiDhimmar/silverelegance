@@ -16,6 +16,7 @@
 .bi{
     cursor: pointer;
     font-size: 18px;
+    color: #B32748;
 }
 /*slider*/
 .w-100 {
@@ -211,7 +212,17 @@
     cursor: pointer;
 }
 /* product by category */
-.product-card img {
-      height: 250px;
-      object-fit: cover;
-    }
+.pro-container{
+  padding-top: 50px;
+}
+.pd-container{
+  margin-top: 50px;
+}
+/*cart*/
+.cart-container{
+  margin-top: 50px;
+}
+/*checkout*/
+.checkout-container{
+  margin-top: 50px;
+}
