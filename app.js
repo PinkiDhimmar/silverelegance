@@ -9,6 +9,7 @@ var app = express();
 
 //This line uses the require function to include the express-session module.
 var session = require('express-session');
+
 //This line contains the configuration to connect the database.
 var conn = require('./dbConfig');
 
@@ -32,16 +33,20 @@ app.use(express.json());
 
 //This line sets up the express application to use 'EJS' as the view engine.
 app.set('view engine','ejs');
+
+
 //This will set up the express application to include the session middleware.
 app.use(session({
 	secret: 'yoursecret',
 	resave: false,
-	saveUninitialized: true
+	saveUninitialized: false,
+	cookie: { maxAge: 1000 * 60 * 60 * 24 } 
 }));
-
-//These lines will ensure that the express application can handle both JSON and URL-encoded data.
-
-
+//pass user globally
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null;
+  next();
+});
 
 //console.log(req.body);
 //This line will check for any request with a URL path starting with '/public'.
@@ -53,7 +58,6 @@ app.use(bodyParser.json());
 
 //serve and attache uplosded image like this
 app.use('/uploads', express.static('uploads'));
-
 
 //count cart items
 app.use((req, res, next) => {
@@ -120,31 +124,55 @@ app.get('/register',function(req,res){
 });
 
 //login page
-app.post('/login', function(req, res) {
-	let email = req.body.email;
-	let password = req.body.password;
-	if (email && password) {
-		conn.query('SELECT * FROM users WHERE email = ? AND password = ?', [email, password], 
-		function(error, results, fields) {
-			if (error) throw error;
-			if (results.length > 0) {
-				req.session.loggedin = true;
-				req.session.email = email;
-				req.session.role = results[0].role;
-				console.log("User role:",results[0].role);
-				console.log("User ID:", results[0].id);
-				const user = results[0];
-				// Redirect to the dashboard page with user ID
-				res.redirect(`/dashboard/${user.id}`);
-			} else {
-				res.send('Incorrect Email and/or Password!');
-			}			
-			res.end();
-		});
-	} else {
-		res.send('Please enter Username and Password!');
-		res.end();
-	}
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  conn.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
+    if (err) throw err;
+    if (results.length === 0 || results[0].password !== password) {
+      return res.render('login', { error: 'Invalid email or password' });
+    }
+
+    const user = results[0];
+    req.session.user = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
+
+    res.redirect('/dashboard');
+  });
+});
+
+//dashboard route --- admin or customer
+app.get('/dashboard', (req, res) => {
+  const user = req.session.user;
+
+  if (!user) return res.redirect('/login');
+
+  if (user.role === 'admin') {
+    return res.redirect('/admin/dashboard');
+  } else {
+    return res.redirect('/customer-dashboard');
+  }
+});
+// get customer-dashboard
+app.get('/customer-dashboard', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'customer') {
+    return res.redirect('/login');
+  }
+
+  res.render('customer-dashboard', { user: req.session.user });
+});
+
+//get admin dashboard
+app.get('/admin/dashboard', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'admin') {
+    return res.redirect('/login'); 
+  }
+
+  res.render('admin/dashboard', { user: req.session.user });
 });
 
 //This will send a POST request to '/register' which will store 
@@ -166,17 +194,7 @@ app.post('/register', function(req, res) {
 	}
 });
 
-//dashboard route --- admin or customer
-app.get('/dashboard/:id', (req, res) => {
-	//var id = req.session.id; // Assuming userId is stored in session after login
-  const userId = req.params.id;
-  conn.query('SELECT * FROM users WHERE id = ?', [userId], (err, results) => {
-    if (err) throw err;
-    if (results.length === 0) return res.send('User not found');
-    const user = results[0];
-    res.render('dashboard', { user });
-  });
-});
+
 
 
 
@@ -213,20 +231,47 @@ app.post('/cart/remove', (req, res) => {
 });
 
 //checkout
+
 app.get('/checkout', (req, res) => {
-  const cart = req.session.cart || [];
-  res.render('checkout', { cart });
+  if (!req.session.user) return res.redirect('/login?redirect=checkout');
+
+  const userId = req.session.user.id;
+  const userQuery = 'SELECT * FROM users WHERE id = ?';
+
+  conn.query(userQuery, [userId], (err, results) => {
+    if (err) throw err;
+
+    const cart = req.session.cart || []; // cart should be in session
+    res.render('checkout', {
+      userData: results[0],
+      cart
+    });
+  });
 });
 
 app.post('/checkout', (req, res) => {
-  const { name, address, email, payment } = req.body;
-  const cart = req.session.cart;
+  if (!req.session.user) return res.redirect('/login');
 
-  if (!cart || cart.length === 0) {
-    return res.redirect('/cart');
-  }
-  req.session.cart = [];// Clear cart
-  res.send('Order placed successfully!'); 
+  const { address, city, postal_code, payment_method } = req.body;
+  const userId = req.session.user.id;
+  const cart = req.session.cart || [];
+
+  if (!cart.length) return res.send("Your cart is empty");
+
+  const orderSql = `INSERT INTO orders (user_id, address, city, postal_code, payment_method, status) VALUES (?, ?, ?, ?, ?, ?)`;
+  conn.query(orderSql, [userId, address, city, postal_code, payment_method, 'pending'], (err, result) => {
+    if (err) throw err;
+
+    const orderId = result.insertId;
+    const itemsSql = `INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ?`;
+    const orderItems = cart.map(item => [orderId, item.id, item.quantity, item.price]);
+
+    conn.query(itemsSql, [orderItems], (err2) => {
+      if (err2) throw err2;
+      req.session.cart = []; // clear cart
+      res.redirect('/thankyou');
+    });
+  });
 });
 
 // contact us page
@@ -247,27 +292,33 @@ app.post('/contact', (req, res) => {
 
 // admin dashboard--- manage products
 app.get('/admin/products', (req, res) => {
+   
   const sql = `SELECT p.id, p.name, p.description, p.price, p.image, c.name AS category_name FROM products p
     			LEFT JOIN categories c ON p.category_id = c.id`;
   conn.query(sql, (err, results) => {
     if (err) throw err;
-    res.render('admin/products', { products: results });
+    res.render('admin/products', { 
+      products: results 
+    });
   });
 });
 
 //admin dashboard----add products (submission by Multer for upload image and also (npm install multer))
 app.get('/admin/products/add', (req, res) => {
+  
   // Fetch categories from MySQL to populate the select dropdown
   conn.query('SELECT * FROM categories', (err, categories) => {
     if (err) throw err;
-    res.render('admin/add-product', { categories });
+    res.render('admin/add-product', { categories 
+      });
   });
 });
 app.post('/admin/products/add', upload.single('image'), (req, res) => {
+ 
   const { name, description, category_id, price } = req.body;
   const image = req.file.filename;
 
-  const sql = 'INSERT INTO products (name, description, category_id, price, image) VALUES (?, ?, ?, ?)';
+  const sql = 'INSERT INTO products (name, description, category_id, price, image) VALUES (?, ?, ?, ?, ?)';
   conn.query(sql, [name, description, category_id, price, image], (err) => {
     if (err) throw err;
     res.redirect('/admin/products');
@@ -277,6 +328,7 @@ app.post('/admin/products/add', upload.single('image'), (req, res) => {
 //admin dashboard-----edit(update) products
 
 app.get('/admin/products/edit/:id', (req, res) => {
+  
   const productId = req.params.id;
 
   const productSql = 'SELECT * FROM products WHERE id = ?';
@@ -296,6 +348,7 @@ app.get('/admin/products/edit/:id', (req, res) => {
 });
 
 app.post('/admin/products/edit/:id', upload.single('image'), (req, res) => {
+
   const productId = req.params.id;
   const { name, description, category_id, price } = req.body;
   let sql, data;
@@ -316,6 +369,7 @@ app.post('/admin/products/edit/:id', upload.single('image'), (req, res) => {
 //admin dashboard ----- delete products
 
 app.get('/admin/products/delete/:id', (req, res) => {
+
   const productId = req.params.id;
   				//Get image filename
   const getImageQuery = 'SELECT image FROM products WHERE id = ?';
@@ -349,16 +403,20 @@ app.get('/admin/products/delete/:id', (req, res) => {
 //admin dashboard ---- product categories
 
 app.get('/admin/categories', (req, res) => {
+  
   const sql = 'SELECT * FROM categories';
   conn.query(sql, (err, results) => {
     if (err) throw err;
-    res.render('admin/categories', { categories: results });
+    res.render('admin/categories', { 
+      user: req.session.user,
+      categories: results });
   });
 });
 
 //admin dashboard ----- add categories
 
 app.get('/admin/categories/add', (req, res) => {
+ 
   res.render('admin/add-category');
 });
 			//slug auto-generation
@@ -367,6 +425,7 @@ function slugify(text) {
 }
 
 app.post('/admin/categories/add', (req, res) => {
+  
   const { name } = req.body;
   const slug = slugify(name);
 
@@ -380,6 +439,7 @@ app.post('/admin/categories/add', (req, res) => {
 //admin dashboard ----- edit categories
 
 app.get('/admin/categories/edit/:id', (req, res) => {
+ 
   const categoryId = req.params.id;
 
   conn.query('SELECT * FROM categories WHERE id = ?', [categoryId], (err, results) => {
@@ -394,6 +454,7 @@ function slugify(text) {
 }
 
 app.post('/admin/categories/edit/:id', (req, res) => {
+  
   const { name } = req.body;
   const slug = slugify(name);
   const id = req.params.id;
@@ -413,6 +474,43 @@ app.get('/admin/categories/delete/:id', (req, res) => {
   conn.query('DELETE FROM categories WHERE id = ?', [categoryId], (err) => {
     if (err) throw err;
     res.redirect('/admin/categories');
+  });
+});
+
+//admin dashboard view registered users
+app.get('/admin/users', (req, res) => {
+  
+  const sql = 'SELECT id, name, email, role, created_at FROM users';
+
+  conn.query(sql, (err, results) => {
+    if (err) throw err;
+    res.render('admin/users', { users: results });
+  });
+});
+
+//admin can edit registered user roles
+
+app.post('/admin/users/:id/role', (req, res) => {
+ 
+  const { role } = req.body;
+  const sql = 'UPDATE users SET role = ? WHERE id = ?';
+  conn.query(sql, [role, req.params.id], (err) => {
+    if (err) throw err;
+    res.redirect('/admin/users');
+  });
+});
+// admin can view orders for a user
+app.get('/admin/users/:id/orders', (req, res) => {
+ 
+  const userId = req.params.id;
+
+  const sql = `SELECT o.id AS order_id, o.total_amount, o.status, o.created_at, o.tracking_number, 
+				u.name AS user_name	FROM orders o JOIN users u ON o.user_id = u.id
+				WHERE o.user_id = ?`;
+
+  conn.query(sql, [userId], (err, orders) => {
+    if (err) throw err;
+    res.render('admin/user-orders', { orders, userId });
   });
 });
 
