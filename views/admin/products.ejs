@@ -12,7 +12,7 @@
   <%- include('../partials/admin-sidebar') %>
 
   <!-- Main Content -->
-  <div style="margin-left: 250px; padding: 3rem; margin-top: 30px;">
+  <div style="margin-left: 230px; padding: 2rem; margin-top: 30px;">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2>Manage Products</h2>
       <a href="/admin/products/add" class="btn btn-primary">Add New Product</a>
@@ -26,6 +26,7 @@
               <th>ID</th>
               <th>Image</th>
               <th>Name</th>
+              <th>Description</th>
               <th>Category</th>
               <th>Price ($)</th>
               <th>Actions</th>
@@ -37,6 +38,7 @@
                 <td><%= product.id %></td>
                 <td><img src="/uploads/<%= product.image %>" alt="<%= product.image %>" width="70"></td>
                 <td><%= product.name %></td>
+                <td><%= product.description %></td>
                 <td><%= product.category_name %></td>
                 <td>$ <%= product.price.toFixed(2) %></td>
                 <td>

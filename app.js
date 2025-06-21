@@ -17,7 +17,7 @@ const multer = require('multer');
 
 const storage = multer.diskStorage({
   destination: 'uploads/', 
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
+  filename: (req, file, cb) => cb(null, file.originalname),
 });
 
 const upload = multer({ storage });
@@ -166,7 +166,7 @@ app.post('/register', function(req, res) {
 	}
 });
 
-//dashboard route
+//dashboard route --- admin or customer
 app.get('/dashboard/:id', (req, res) => {
 	//var id = req.session.id; // Assuming userId is stored in session after login
   const userId = req.params.id;
@@ -186,7 +186,7 @@ app.get('/cart', (req, res) => {
   res.render('cart', { cart });
 });
 
-//product-by-categories (add to cart)
+//product-by-categories page (add to cart)
 app.post('/cart/add', (req, res) => {
   const { productId, name, price, quantity } = req.body;
   const id = parseInt(productId); // Parse and validate
@@ -247,7 +247,7 @@ app.post('/contact', (req, res) => {
 
 // admin dashboard--- manage products
 app.get('/admin/products', (req, res) => {
-  const sql = `SELECT p.id, p.name, p.price, p.image, c.name AS category_name FROM products p
+  const sql = `SELECT p.id, p.name, p.description, p.price, p.image, c.name AS category_name FROM products p
     			LEFT JOIN categories c ON p.category_id = c.id`;
   conn.query(sql, (err, results) => {
     if (err) throw err;
@@ -264,15 +264,158 @@ app.get('/admin/products/add', (req, res) => {
   });
 });
 app.post('/admin/products/add', upload.single('image'), (req, res) => {
-  const { name, category_id, price } = req.body;
+  const { name, description, category_id, price } = req.body;
   const image = req.file.filename;
 
-  const sql = 'INSERT INTO products (name, category_id, price, image) VALUES (?, ?, ?, ?)';
-  conn.query(sql, [name, category_id, price, image], (err) => {
+  const sql = 'INSERT INTO products (name, description, category_id, price, image) VALUES (?, ?, ?, ?)';
+  conn.query(sql, [name, description, category_id, price, image], (err) => {
     if (err) throw err;
     res.redirect('/admin/products');
   });
 });
+
+//admin dashboard-----edit(update) products
+
+app.get('/admin/products/edit/:id', (req, res) => {
+  const productId = req.params.id;
+
+  const productSql = 'SELECT * FROM products WHERE id = ?';
+  const categorySql = 'SELECT * FROM categories';
+
+  conn.query(productSql, [productId], (err, productResults) => {
+    if (err) throw err;
+    if (productResults.length === 0) return res.send('Product not found');
+
+    const product = productResults[0];
+
+    conn.query(categorySql, (err, categories) => {
+      if (err) throw err;
+      res.render('admin/edit-product', { product, categories });
+    });
+  });
+});
+
+app.post('/admin/products/edit/:id', upload.single('image'), (req, res) => {
+  const productId = req.params.id;
+  const { name, description, category_id, price } = req.body;
+  let sql, data;
+  if (req.file) {  // New image uploaded
+	const image = req.file.filename;
+   sql = `UPDATE products SET name = ?, description = ?, category_id = ?, price = ?, image = ? WHERE id = ?`;
+    data = [name, description, category_id, price, image, productId];
+  } else {// No image uploaded
+    sql = `UPDATE products SET name = ?, description = ?, category_id = ?, price = ? WHERE id = ?`;
+    data = [name, description, category_id, price, productId];
+  }
+  conn.query(sql, data, (err, result) => {
+    if (err) throw err;
+    res.redirect('/admin/products');
+  });
+});
+
+//admin dashboard ----- delete products
+
+app.get('/admin/products/delete/:id', (req, res) => {
+  const productId = req.params.id;
+  				//Get image filename
+  const getImageQuery = 'SELECT image FROM products WHERE id = ?';
+  conn.query(getImageQuery, [productId], (err, result) => {
+    if (err) throw err;
+
+    if (result.length === 0) {
+      return res.send('Product not found');
+    }
+    const imageName = result[0].image;
+
+    		// Delete product from database
+    const deleteQuery = 'DELETE FROM products WHERE id = ?';
+    conn.query(deleteQuery, [productId], (err2) => {
+      if (err2) throw err2;
+
+      		// Step 3: Remove image from filesystem (uploads folder)
+	  const fs = require('fs');
+	  const path = require('path');
+      const imagePath = path.join(__dirname, 'uploads', imageName);
+      fs.unlink(imagePath, (unlinkErr) => {
+        if (unlinkErr) {
+          console.warn('Image not deleted or not found:', imageName);
+        }
+        return res.redirect('/admin/products');
+      });
+    });
+  });
+});
+
+//admin dashboard ---- product categories
+
+app.get('/admin/categories', (req, res) => {
+  const sql = 'SELECT * FROM categories';
+  conn.query(sql, (err, results) => {
+    if (err) throw err;
+    res.render('admin/categories', { categories: results });
+  });
+});
+
+//admin dashboard ----- add categories
+
+app.get('/admin/categories/add', (req, res) => {
+  res.render('admin/add-category');
+});
+			//slug auto-generation
+function slugify(text) {
+  return text.toString().toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+}
+
+app.post('/admin/categories/add', (req, res) => {
+  const { name } = req.body;
+  const slug = slugify(name);
+
+  const sql = 'INSERT INTO categories (name, slug) VALUES (?, ?)';
+  conn.query(sql, [name, slug], (err) => {
+    if (err) throw err;
+    res.redirect('/admin/categories');
+  });
+});
+
+//admin dashboard ----- edit categories
+
+app.get('/admin/categories/edit/:id', (req, res) => {
+  const categoryId = req.params.id;
+
+  conn.query('SELECT * FROM categories WHERE id = ?', [categoryId], (err, results) => {
+    if (err) throw err;
+    if (results.length === 0) return res.send('Category not found');
+
+    res.render('admin/edit-category', { category: results[0] });
+  });
+});
+function slugify(text) {
+  return text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+}
+
+app.post('/admin/categories/edit/:id', (req, res) => {
+  const { name } = req.body;
+  const slug = slugify(name);
+  const id = req.params.id;
+
+  const sql = 'UPDATE categories SET name = ?, slug = ? WHERE id = ?';
+  conn.query(sql, [name, slug, id], (err) => {
+    if (err) throw err;
+    res.redirect('/admin/categories');
+  });
+});
+
+// admin dashboard ------ delete categories
+
+app.get('/admin/categories/delete/:id', (req, res) => {
+  const categoryId = req.params.id;
+
+  conn.query('DELETE FROM categories WHERE id = ?', [categoryId], (err) => {
+    if (err) throw err;
+    res.redirect('/admin/categories');
+  });
+});
+
 
 
 //This will be used to return to home page after the members logout.
