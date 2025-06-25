@@ -37,7 +37,8 @@
         <% if (!user) { %>
           <div class="mb-4">
             <h4>Login to Continue</h4>
-            <form action="/login?redirect=checkout" method="POST">
+             <form method="POST" action="/login">
+              <input type="hidden" name="redirect" value="/checkout" />
               <div class="mb-3">
                 <label>Email</label>
                 <input type="email" name="email" class="form-control" required>
@@ -49,13 +50,22 @@
               <button type="submit" class="btn btn-primary">Login</button>
             </form>
           </div>
+          <p>or</p>
+           <!-- Guest Checkout -->
+    <form method="POST" action="/checkout/guest">
+      <input type="text" name="name" placeholder="Full Name" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="text" name="address" placeholder="Shipping Address" required />
+      <button type="submit">Continue as Guest</button>
+    </form>
+  </div>
         <% } else { %>
           <!-- LOGGED IN VIEW -->
 
-          <form action="/checkout" method="POST">
+          <form method="POST" action="/checkout/place-order">
             <h4>Contact Information</h4>
-            <p><strong>Name:</strong> <%= userData.name %></p>
-            <p><strong>Email:</strong> <%= userData.email %></p>
+            <p><strong>Name:</strong> <%= user.name %></p>
+            <p><strong>Email:</strong> <%= user.email %></p>
 
             <h4 class="mt-4">Shipping Address</h4>
             <div class="mb-3">

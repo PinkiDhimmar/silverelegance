@@ -39,9 +39,14 @@ app.set('view engine','ejs');
 app.use(session({
 	secret: 'yoursecret',
 	resave: false,
-	saveUninitialized: false,
+	saveUninitialized: true,
 	cookie: { maxAge: 1000 * 60 * 60 * 24 } 
 }));
+// Make session available in all views
+app.use((req, res, next) => {
+  res.locals.session = req.session;
+  next();
+});
 //pass user globally
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
@@ -125,23 +130,19 @@ app.get('/register',function(req,res){
 
 //login page
 app.post('/login', (req, res) => {
-  const { email, password } = req.body;
+  const email = req.body.email;
+  const password = req.body.password;
+  const redirect = req.body.redirect || '/dashboard';
 
   conn.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
-    if (err) throw err;
-    if (results.length === 0 || results[0].password !== password) {
-      return res.render('login', { error: 'Invalid email or password' });
+    if (err) return res.send('DB error');
+
+    if (results.length > 0 && results[0].password === password) {
+      req.session.user = results[0];
+      return res.redirect(redirect);
+    } else {
+      return res.send('Invalid login');
     }
-
-    const user = results[0];
-    req.session.user = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-    };
-
-    res.redirect('/dashboard');
   });
 });
 
@@ -231,47 +232,75 @@ app.post('/cart/remove', (req, res) => {
 });
 
 //checkout
-
 app.get('/checkout', (req, res) => {
-  if (!req.session.user) return res.redirect('/login?redirect=checkout');
+  if (!req.session.cart) {
+    req.session.cart = [];
+  }
 
-  const userId = req.session.user.id;
-  const userQuery = 'SELECT * FROM users WHERE id = ?';
+  res.render('checkout', {
+    user: req.session.user || null,
+    cart: req.session.cart
+  });
+});
 
-  conn.query(userQuery, [userId], (err, results) => {
-    if (err) throw err;
 
-    const cart = req.session.cart || []; // cart should be in session
-    res.render('checkout', {
-      userData: results[0],
-      cart
+app.post('/checkout', (req, res) => {
+  const cart = req.session.cart;
+  const user = req.session.user;
+  const { address, city, postal } = req.body;
+
+  if (!user || !cart || cart.length === 0) {
+    return res.send('Login required and cart must not be empty.');
+  }
+
+  const name = user.name;
+  const email = user.email;
+  const userId = user.id || null;
+
+  // calculate total
+  let total = 0;
+  cart.forEach(item => {
+    total += item.price * item.quantity;
+  });
+
+  const orderSql = `
+    INSERT INTO orders (user_id, customer_name, email, address, city, postal, total_amount)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  conn.query(orderSql, [userId, name, email, address, city, postal, total], (err, result) => {
+    if (err) return res.send('Error saving order.');
+
+    const orderId = result.insertId;
+
+    // prepare order items
+    const itemsSql = `
+      INSERT INTO order_items (order_id, product_id, quantity, price)
+      VALUES ?
+    `;
+    const itemValues = cart.map(item => [orderId, item.product_id, item.quantity, item.price]);
+
+    conn.query(itemsSql, [itemValues], (err2) => {
+      if (err2) return res.send('Error saving order items.');
+
+      req.session.cart = []; // clear cart
+      res.send(`✅ Order placed successfully. Your order ID is ${orderId}`);
     });
   });
 });
 
-app.post('/checkout', (req, res) => {
-  if (!req.session.user) return res.redirect('/login');
 
-  const { address, city, postal_code, payment_method } = req.body;
-  const userId = req.session.user.id;
-  const cart = req.session.cart || [];
+app.post('/checkout/guest', (req, res) => {
+  const { name, email, address } = req.body;
 
-  if (!cart.length) return res.send("Your cart is empty");
+  req.session.user = {
+    name,
+    email,
+    address,
+    isGuest: true
+  };
 
-  const orderSql = `INSERT INTO orders (user_id, address, city, postal_code, payment_method, status) VALUES (?, ?, ?, ?, ?, ?)`;
-  conn.query(orderSql, [userId, address, city, postal_code, payment_method, 'pending'], (err, result) => {
-    if (err) throw err;
-
-    const orderId = result.insertId;
-    const itemsSql = `INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ?`;
-    const orderItems = cart.map(item => [orderId, item.id, item.quantity, item.price]);
-
-    conn.query(itemsSql, [orderItems], (err2) => {
-      if (err2) throw err2;
-      req.session.cart = []; // clear cart
-      res.redirect('/thankyou');
-    });
-  });
+  res.redirect('/checkout');
 });
 
 // contact us page

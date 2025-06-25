@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<head>
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow p-4 fixed-top">
 <div class="container">
   <a class="navbar-brand" href="/">SILVER ELEGANCE</a>
@@ -41,7 +44,7 @@
  
   </div>
  <div class="navbar-nav right">
-    <a href="/login" class="icon-link"><i class="bi bi-person me-3"></i></a>
+    <a href="#" class="icon-link" onclick="toggleUserPanel()"><i class="bi bi-person me-3"></i></a>
     <a href="/cart" class="icon-link"><i class="bi bi-cart me-3"></i>
       <% if (cartCount > 0) { %>
       <span class="badge bg-danger"><%= cartCount %></span>
@@ -49,7 +52,30 @@
     </a>
     <a href="/wishlist" class="icon-link"><i class="bi bi-heart me-3"></i></a>
  </div>
- 
+ <!-- Right-side login/user panel -->
+<div id="userPanel" class="side-panel">
+  <span class="close-btn" onclick="toggleUserPanel()">&times;</span>
+  <% if (session.user) { %>
+    <h3>Welcome, <%= session.user.name %></h3>
+    <p>Email: <%= session.user.email %></p>
+    <a href="/logout">Logout</a>
+  <% } else { %>
+    <h3> MEMBER LOGIN </h3>
+    <form action="/login" method="POST">
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit" class="log">Login</button>
+      <a href="/forgot-password" class="for-pass"> FORGOT YOUR PASSWORD? </a>
+      <h2 class="member"> Not a Member? </h2>
+      <button type="submit"> JOIN NOW </button> 
+    </form>
+  <% } %>
+</div>
   </div>
 </nav>
+<script>
+function toggleUserPanel() {
+  document.getElementById("userPanel").classList.toggle("open");
+}
+</script>
 </html>
