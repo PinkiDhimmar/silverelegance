@@ -1,0 +1,14 @@
+ <head>
+    <link href="/public/css/style.css" rel="stylesheet">
+ </head>
+ <body>
+ <div class="col-md-3 fixed-sidebar p-3">
+          <h4 class="mb-4">Welcome, <%= user.name %></h4>
+            <a href="/customer-dashboard" class="nav-link <%= current === 'dashboard' ? 'active' : '' %>">My Details</a>
+            <a href="/customer/myorder" class="nav-link <%= current === 'orders' ? 'active' : '' %>">My Order</a>
+            <a href="/customer/address" class="nav-link <%= current === 'address' ? 'active' : '' %>">Address Book</a>
+            <a href="/customer/change-password" class="nav-link <%= current === 'password' ? 'active' : '' %>">Change Password</button>
+            <a class="nav-link text-danger" href="/logout">Logout</a>
+          </div>
+
+</body>
