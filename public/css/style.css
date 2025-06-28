@@ -429,13 +429,60 @@
       margin-left: 300px;
       padding: 2rem;
 }
-/*my order details*/
-.table-responsive .view{
-    color: #B32748;
-    border: 1px solid #B32748;
+.c-pass .pass{
+  color: #B32748;
+  border: 1px solid #B32748;
 }
-.table-responsive .view:hover{
-  color: #fff;
+.c-pass .pass:hover{
   background-color: #B32748;
-  align-items: center;
+  color: #fff;
+}
+/*customer-dashboard my order details*/
+.myorder{
+   margin-top: 70px;
+      margin-left: 300px;
+      padding: 2rem;
+      height: 400px;
+}
+.myorder .view{
+  color: #B32748;
+  border:1px solid #B32748;
+}
+.myorder .view:hover{
+  background-color: #B32748;
+  color: #fff;
+}
+.myorder .shopping{
+  padding: 10px;
+  margin-top: 20px;
+border:1px solid #f2f2f2;
+background-color: #f2f2f2;
+position: relative;
+}
+.ss{
+  margin-top: 1 rem;
+  padding: 0.5rem 1rem;
+  line-height: 1.57143;
+  background-color: #B32748;
+  color: #fff;
+  font-weight: bold;
+  appearance: none;
+  transition: background .2s, color .2s, border-color .2s;
+  cursor: pointer;
+ text-decoration: none;   
+}
+.orderdetails{
+      margin-top: 70px;
+      margin-left: 300px;
+      padding: 2rem;
+      height: 400px;
+}
+
+.orderdetails .back{
+  color: #B32748;
+  border: 1px solid #B32748;
+}
+.orderdetails .back:hover{
+  background-color: #B32748;
+  color: #fff;
 }

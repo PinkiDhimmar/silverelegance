@@ -197,6 +197,51 @@ app.get('/customer-dashboard', (req, res) => {
     });
   });
 // customer-dashboard-view order- view details of order 
+app.get('/customer/myorder', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'customer') {
+    return res.redirect('/login');
+  }
+  const userId = req.session.user.id;
+
+  conn.query('SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC', [userId], (err, orders) => {
+    if (err) return res.send('Error fetching orders');
+
+    res.render('customer/myorder', {
+      user: req.session.user,
+      orders: orders,
+      current: 'orders' // for sidebar highlighting
+    });
+  });
+});
+app.get('/customer/order-details/:id', (req, res) => { 
+  const orderId = req.params.id;
+  const userId = req.session.user.id;
+
+  // Get order info
+  conn.query('SELECT * FROM orders WHERE id = ? AND user_id = ?', [orderId, userId], (err, orderResult) => {
+    if (err || orderResult.length === 0) {
+      return res.send('Order not found or unauthorized.');
+    }
+
+    const order = orderResult[0];
+
+    // Join order_items with products to get item details
+    const sql = `SELECT order_items.quantity, products.name, products.price, products.image FROM order_items
+                  JOIN products ON order_items.product_id = products.id WHERE order_items.order_id = ?`;
+
+    conn.query(sql, [orderId], (err2, items) => {
+      if (err2) return res.send('Error loading order items');
+
+      res.render('customer/order-details', {
+        order,
+        items,
+        current: 'orders'
+      });
+    });
+  });
+});
+
+
 //customer-dashboard ----- edit address
 app.get('/customer/address', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'customer') {
