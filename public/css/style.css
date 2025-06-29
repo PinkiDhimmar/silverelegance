@@ -486,3 +486,19 @@ position: relative;
   background-color: #B32748;
   color: #fff;
 }
+/*admin dashboard------products*/
+ .content {
+      margin-left: 240px;
+      margin-top: 30px;
+      padding: 3rem;
+      flex-grow: 1;
+      width: calc(100% - 240px);
+    }  
+ .content .btn {
+      border:1px solid #B32748;
+      color: #B32748;
+    }
+.content .btn:hover{
+  color: #fff;
+  background-color: #B32748;
+}

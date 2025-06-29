@@ -431,11 +431,8 @@ app.post('/customer/change-password', (req, res) => {
 
       const orderId = result.insertId;
 
-      // prepare order items
-      const itemsSql = `
-      INSERT INTO order_items (order_id, product_id, quantity, price)
-      VALUES ?
-    `;
+                         // prepare order items
+      const itemsSql = `INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ?`;
       const itemValues = cart.map(item => [orderId, item.product_id, item.quantity, item.price]);
 
       conn.query(itemsSql, [itemValues], (err2) => {
@@ -665,6 +662,65 @@ app.post('/customer/change-password', (req, res) => {
       res.redirect('/admin/categories');
     });
   });
+
+  //admin dashboard----view orders
+
+  app.get('/admin/orders', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'admin') {
+    return res.redirect('/login');
+  }
+
+  const sql = `SELECT orders.id, orders.total_amount, orders.status, orders.created_at, users.name
+                FROM orders JOIN users ON orders.user_id = users.id`;
+
+  conn.query(sql, (err, results) => {
+    if (err) {
+      console.log(err);
+      return res.send('Failed to fetch orders');
+    }
+
+    res.render('admin/orders', {
+      orders: results,
+      current: 'orders'
+    });
+  });
+});
+//admin-dashboard---view order-details
+app.get('/admin/order-details/:id', (req, res) => {
+  const orderId = req.params.id;
+
+  conn.query('SELECT * FROM orders WHERE id = ?', [orderId], (err, orderResult) => {
+    if (err || orderResult.length === 0) return res.send('Order not found');
+
+    const order = orderResult[0];
+
+    const sql = `SELECT order_items.quantity, products.name, products.price FROM order_items
+                JOIN products ON order_items.product_id = products.id WHERE order_items.order_id = ?`;
+
+    conn.query(sql, [orderId], (err2, items) => {
+      if (err2) return res.send('Could not load items');
+
+      res.render('admin/order-details', {
+        order,
+        items,
+        message: req.query.message || null
+      });
+    });
+  });
+});
+
+app.post('/admin/update-order/:id', (req, res) => {
+  const orderId = req.params.id;
+  const { status, payment_status, payment_method, tracking_number, courier_name } = req.body;
+
+  const sql = `UPDATE orders SET status = ?, payment_status = ?, payment_method = ?, tracking_number = ? WHERE id = ?`;
+
+  conn.query(sql, [status, payment_status, payment_method, tracking_number, orderId], (err) => {
+    if (err) return res.send('Failed to update order');
+
+    res.redirect('/admin/order-details/' + orderId + '?message=Order updated successfully');
+  });
+});
 
   //admin dashboard view registered users
   app.get('/admin/users', (req, res) => {
