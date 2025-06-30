@@ -759,9 +759,26 @@ app.post('/admin/update-order/:id', (req, res) => {
     });
   });
 
+//admin dashboard-------------view messages and reply messages
+app.get('/admin/messages', (req, res) => {
+  conn.query('SELECT * FROM messages ORDER BY created_at DESC', (err, results) => {
+    if (err) return res.send('Error loading messages');
+    res.render('admin/messages', { messages: results });
+  });
+});
+
+app.post('/admin/messages/:id/reply', (req, res) => {
+  const reply = req.body.reply;
+  const id = req.params.id;
+
+  conn.query('UPDATE messages SET reply = ? WHERE id = ?', [reply, id], (err) => {
+    if (err) return res.send('Reply failed');
+    res.redirect('/admin/messages');
+  });
+});
 
 
-  //This will be used to return to home page after the members logout.
+//This will be used to return to home page after the members logout.
   app.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
