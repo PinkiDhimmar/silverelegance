@@ -460,7 +460,7 @@ app.post('/customer/change-password', (req, res) => {
 
   // contact us page
   app.get('/contact', (req, res) => {
-    res.render('contact', { success: false });
+    res.render('contact', { msg: req.query.msg });
   });
 
   app.post('/contact', (req, res) => {
@@ -470,7 +470,7 @@ app.post('/customer/change-password', (req, res) => {
       [name, email, message], (err) => {
         if (err) throw err;
         console.log("Contact form submitted:", { name, email, message });
-        res.render('contact', { success: true });
+        res.redirect('/contact?msg=Message sent successfully!');
       });
   });
 

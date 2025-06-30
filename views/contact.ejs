@@ -3,42 +3,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Contact Us - Silver Elegance</title>
+  <title>Contact Us | Silver Elegance</title>
   <link href="/public/css/style.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
   <%- include (`partials/navbar1.ejs`) %>
 
-  <div class="container my-5 pt-5">
-    <h2 class="mb-5">Contact Us</h2>
-    <p>We’d love to hear from you! Please fill out the form below and we’ll get back to you shortly.</p>
+  <div class="contact-header mt-5 pt-5">
+    <h1>Contact Us</h1>
+    <p class="lead">We’d love to hear from you. Reach out any time!</p>
+  </div>
 
-    <form action="/contact" method="POST" class="row g-3">
+  <div class="container my-5">
+    <div class="row g-4">
+      <!-- Contact Form -->
       <div class="col-md-6">
-        <label for="name" class="form-label">Your Name</label>
-        <input type="text" class="form-control" name="name" id="name" required>
+        <div class="card p-4 contact-card">
+          <h4>Send us a message</h4>
+          <% if (msg) { %>
+            <div class="alert alert-success"><%= msg %></div>
+          <% } %>
+          <form method="POST" action="/contact">
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
+              <label for="name">Name</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+              <label for="email">Email</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="subject" name="subject" placeholder="Subject" required>
+              <label for="subject">Subject</label>
+            </div>
+            <div class="form-floating mb-3">
+              <textarea class="form-control" id="message" name="message" placeholder="Message" style="height: 120px" required></textarea>
+              <label for="message">Message</label>
+            </div>
+            <button type="submit" class="btn">Send Message</button>
+          </form>
+        </div>
       </div>
 
+      <!-- Google Map -->
       <div class="col-md-6">
-        <label for="email" class="form-label">Your Email</label>
-        <input type="email" class="form-control" name="email" id="email" required>
+        <div class="card p-0 contact-card">
+          <div class="map-responsive">
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.021694159971!2d144.9559283156773!3d-37.817209979751634!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad65d43f3c4b6fb%3A0x2b1fcfc87b7e2c3d!2sQueen%20Victoria%20Market%2C%20Melbourne!5e0!3m2!1sen!2snz!4v1719640110123!5m2!1sen!2snz"
+              allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </div>
       </div>
-
-      <div class="col-12">
-        <label for="message" class="form-label">Your Message</label>
-        <textarea class="form-control" name="message" id="message" rows="5" required></textarea>
-      </div>
-
-      <div class="col-12">
-        <button type="submit" class="btn btn-primary">Send Message</button>
-      </div>
-    </form>
-
-    <% if (success) { %>
-      <div class="alert alert-success mt-4">Thank you! Your message has been sent.</div>
-    <% } %>
+    </div>
   </div>
 
   <%- include (`partials/footer.ejs`) %>

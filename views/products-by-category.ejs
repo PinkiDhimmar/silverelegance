@@ -12,15 +12,15 @@
 
   <%- include (`partials/navbar1.ejs`) %>
 
-  <div class="pro-container container mt-5">
-    <h2 class="text-capitalize text-center mb-4"><%= categorySlug %> Collection</h2>
-
+  <div class="pro-container mt-5 pt-5">
+    <h2 class="text-capitalize mt-3"><%= categorySlug %> Collection</h2>
+  </div>
     <div class="row">
       <% if (products.length === 0) { %>
         <p class="text-center">No products found in this category.</p>
       <% } else { %>    
         <% products.forEach(product => { %>
-          <div class="col-md-4 mb-4">
+          <div class="col-md-4 mb-4 mt-3">
             <div class="card product-card h-100">
             <a href="/product/<%= product.id %>"> 
               <img src="/public/images/<%= product.image %>" class="card-img-top" alt="<%= product.name %>" />
@@ -32,8 +32,8 @@
                 <input type="hidden" name="productId" value="<%= product.id %>">
                 <input type="hidden" name="name" value="<%= product.name %>">
                 <input type="hidden" name="price" value="<%= product.price %>">
-                <a href="/product/<%= product.id %>" class="btn btn-outline-secondary">View Details</a>
-                <button type="submit" class="btn btn-primary">Add to Cart</button>
+                <a href="/product/<%= product.id %>" class="btn view">View Details</a>
+                <button type="submit" class="btn add">Add to Cart</button>
                 </form>
                 
               </div>
@@ -42,7 +42,6 @@
         <% }) %>
       <% } %>
     </div>
-  </div>
 
   <%- include (`partials/footer.ejs`) %>
 
