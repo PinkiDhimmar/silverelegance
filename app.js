@@ -83,6 +83,7 @@ app.use((req, res, next) => {
   });
 });
 
+
 // Route: Products by category slug
 app.get('/products/:slug', (req, res) => {
   const slug = req.params.slug;
@@ -265,9 +266,7 @@ app.post('/customer/update-address', (req, res) => {
   const userId = req.session.user.id;
   const { address, city, postal_code, country } = req.body;
 
-  conn.query(
-    'UPDATE users SET address=?, city=?, postal_code=?, country=? WHERE id=?',
-    [address, city, postal_code, country, userId],
+  conn.query('UPDATE users SET address=?, city=?, postal_code=?, country=? WHERE id=?',[address, city, postal_code, country, userId],
     (err, result) => {
       if (err) return res.send('Failed to update address');
 
@@ -354,9 +353,6 @@ app.post('/customer/change-password', (req, res) => {
   });
 
 
-
-
-
   //view cart page
   app.get('/cart', (req, res) => {
     const cart = req.session.cart || [];
@@ -365,20 +361,46 @@ app.post('/customer/change-password', (req, res) => {
 
   //product-by-categories page (add to cart)
   app.post('/cart/add', (req, res) => {
-    const { productId, name, price, quantity } = req.body;
-    const id = parseInt(productId); // Parse and validate
-    const qty = parseInt(quantity); // Parse and validate
-    const cartItem = { id, name, price: parseFloat(price), quantity: qty };
+  const { productId, name, price, quantity, image, code } = req.body;
 
-    if (!req.session.cart) req.session.cart = [];// Initialize cart
-    const existingIndex = req.session.cart.findIndex(p => p.id === id);// Check if product is already in cart
-    if (existingIndex !== -1) {
-      req.session.cart[existingIndex].quantity += qty;// Update quantity
-    } else {
-      req.session.cart.push(cartItem);// Add new item
-    }
-    res.redirect('/cart');
-  });
+  // Parse numeric values safely
+  const id = parseInt(productId, 10);
+  const qty = parseInt(quantity, 10);
+  const parsedPrice = parseFloat(price);
+
+  // Basic validation
+  if (
+    !id || !name || isNaN(parsedPrice) ||
+    !qty || qty < 1 || !image
+  ) {
+    return res.status(400).send('Invalid product data');
+  }
+
+  // Initialize cart if not present
+  if (!req.session.cart) req.session.cart = [];
+
+  // Check if product already in cart
+  const existingIndex = req.session.cart.findIndex(item => item.id === id);
+
+  if (existingIndex !== -1) {
+    // Product exists, update quantity
+    req.session.cart[existingIndex].quantity += qty;
+  } else {
+    // Add new product
+    req.session.cart.push({
+      id,
+      name,
+      price: parsedPrice,
+      quantity: qty,
+      code: code || '',
+      image // No fallback here, expect form to send valid image
+    });
+  }
+
+  // Redirect user to checkout page
+  res.redirect('/checkout');
+});
+
 
   //remove item from cart
   app.post('/cart/remove', (req, res) => {
@@ -390,15 +412,18 @@ app.post('/customer/change-password', (req, res) => {
   });
 
   //checkout
+  function calculateTotal(cart) {return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);}
   app.get('/checkout', (req, res) => {
+  const cart = req.session.cart || [];
+  const total = calculateTotal(cart);
     if (!req.session.cart) {
       req.session.cart = [];
     }
 
     res.render('checkout', {
       user: req.session.user || null,
-      cart: req.session.cart
-    });
+      cart, total
+        });
   });
 
 

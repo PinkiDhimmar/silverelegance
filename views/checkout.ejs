@@ -1,65 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Checkout - Silver Elegance</title>
   <link href="/public/css/style.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  
+
 </head>
+
 <body>
 
   <%- include('partials/navbar1') %>
+    <div class="checkout">
+          <h1>Checkout</h1>    
+    </div>
 
-  <div class="container mt-5">
-    <h2 class="mb-4">Checkout</h2>
+    <div class="checkout-container container">
+      
+        <!-- Center (inline Login & Guest) -->
+      <div class="checkout-header container">
+          
+        <div class="checkout-main">
 
-    <div class="checkout-container">
+          <% if (!user) { %>
+            <div class="mb-4 plc">
+              <h5>Please Login to Continue</h5>
+              <form method="POST" action="/login">
+                <input type="hidden" name="redirect" value="/checkout" />
+                <div class="mb-3">
+                  <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+                </div>
+                <div class="mb-3">
+                  <input type="password" name="password" class="form-control" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn">Login & Continue</button>
+              </form>
+            </div>
+            <div class="hr-or"><span>OR</span></div>
+            <!-- Guest Checkout -->
+            <div class="guest-container justify-content-center mb-3">
+              <form method="POST" action="/checkout/guest">
+                <div class="mb-3">
+                  <input type="text" name="name" class="form-control" placeholder="Full Name" required />
+                </div>
+                <div class="mb-3">
+                  <input type="email" name="email" class="form-control" placeholder="Email" required />
+                </div>
+                <div class="mb-3">
+                  <input type="text" name="address" id="guest-address" class="form-control"
+                    placeholder="Shipping Address" required />
+                </div>
+                <button type="submit" class="btn guest">Continue as Guest</button>
 
-      <!-- LEFT SIDE -->
-      <div class="checkout-main">
-
-        <% if (!user) { %>
-          <div class="mb-4 plc">
-            <h5>Please Login to Continue</h5>
-             <form method="POST" action="/login">
-              <input type="hidden" name="redirect" value="/checkout" />
-              <div class="mb-3">
-                <input type="email" name="email" class="form-control" placeholder="Email Address" required>
-              </div>
-              <div class="mb-3">
-                <input type="password" name="password" class="form-control" placeholder="Password" required>
-              </div>
-              <button type="submit" class="btn">Login & Continue</button>
-            </form>
-          </div>
-          <div class="hr-or"><span>OR</span></div>
-           <!-- Guest Checkout -->
-            <div class="guest-container mb-3">
-            <form method="POST" action="/checkout/guest">
-              <div class="mb-3">
-              <input type="text" name="name" placeholder="Full Name" required />
-              </div>
-              <div class="mb-3">
-              <input type="email" name="email" placeholder="Email" required />
-              </div>
-              <div class="mb-3">
-              <input type="text" name="address" placeholder="Shipping Address" required />
-              </div>
-              <div class="mb-3">
-              <button type="submit">Continue as Guest</button>
-              </div>
-            </form>
-         </div>
-  </div>
+              </form>
+            </div>
+        </div>
         <% } else { %>
           <!-- LOGGED IN VIEW -->
 
           <form method="POST" action="/checkout/place-order">
             <h4>Contact Information</h4>
-            <p><strong>Name:</strong> <%= user.name %></p>
-            <p><strong>Email:</strong> <%= user.email %></p>
+            <p><strong>Name:</strong>
+              <%= user.name %>
+            </p>
+            <p><strong>Email:</strong>
+              <%= user.email %>
+            </p>
 
             <h4 class="mt-4">Shipping Address</h4>
             <div class="mb-3">
@@ -78,7 +86,7 @@
             <h4 class="mt-4">Payment Method</h4>
             <div class="mb-3">
               <select name="payment_method" class="form-select" required>
-                <option value="cod">Pick UP</option>
+                <option value="pu">Pick UP</option>
                 <option value="stripe">Credit/Debit Card (via Stripe)</option>
               </select>
             </div>
@@ -86,49 +94,146 @@
             <button type="submit" class="btn btn-success">Securely Place Order</button>
           </form>
 
-        <% } %>
+          <% } %>
+        </div>
+     
+<div class="container checkout-cart-summary">
+        <!--cart -> right side-->
+        <div class="checkout-cart">
+          <h3>Your Cart</h3>
+          <% if (cart.length> 0) { %>
+            <% cart.forEach(item=> { %>
+              <div class="cart-item">
+                <div class="item-image">
+                  <img src="/public/images/<%=item.image %>">
+                </div>
+                <div class="item-info">
+                  <h6 style="font-weight: bold;">
+                    <%= item.name %>
+                  </h6>
+                  <p> $<span class="unit-price"><%= item.price.toFixed(2) %></span></p>
+                  <small>Delivery 1–3 Working Days</small>
+                  <div class="input-group mb-3">
+                    <button type="button" class="btn btn-outline-secondary btn-sm qty-btn minus">–</button>
+                    <input type="number" name="quantity" value="1" min="1" class="form-control text-center qty-input">
+                    <button type="button" class="btn btn-outline-secondary btn-sm qty-btn plus">+</button>
+                    <div class="trash d-flex align-items-center p-1">
+                      <a href="/cart/remove/<%= item.id %>"><i class="bi bi-trash3"></i></a>
+                    </div>
+                  </div>
+                  <a href="/cart/wishlist/<%= item.id %>" class="btn btn-danger btn-sm">Move to Wishlist</a>
+                  <hr>
+                  Subtotal: $<span class="subtotal">
+                    <%= (item.price * item.quantity).toFixed(2) %>
+                  </span>
+                </div>
 
-      </div>
+              </div>
+
+              <% }) %>
+
+                <% } else { %>
+                  <p>Your cart is empty.</p>
+                  <% } %>
+        </div>
 
       <!-- RIGHT SIDE -->
-      <div class="checkout-summary border rounded p-3 shadow-sm">
+      <div class="checkout-summary border rounded p-3 shadow-sm ">
         <h5>Order Summary</h5>
-        <% if (cart && cart.length > 0) { %>
-          <table class="table table-sm">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Qty</th>
-                <th>Subtotal</th>
+
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="summary-body">
+            <% cart.forEach(item=> { %>
+              <tr data-id="<%= item.id %>">
+                <td>
+                  <%= item.name %>
+                </td>
+                <td class="summary-qty">
+                  <%= item.quantity %>
+                </td>
+                <td class="summary-subtotal">$<%= (item.price * item.quantity).toFixed(2) %>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              <% let total = 0; %>
-              <% cart.forEach(item => { 
-                   const subtotal = item.price * item.quantity;
-                   total += subtotal;
-              %>
-                <tr>
-                  <td><%= item.name %></td>
-                  <td><%= item.quantity %></td>
-                  <td>$<%= subtotal.toFixed(2) %></td>
-                </tr>
-              <% }); %>
-              <tr>
-                <td colspan="2"><strong>Total</strong></td>
-                <td><strong>$<%= total.toFixed(2) %></strong></td>
-              </tr>
-            </tbody>
-          </table>
-        <% } else { %>
-          <p>Your cart is empty.</p>
-        <% } %>
+              <% }) %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"><strong>Total</strong></td>
+              <td><strong>$<span id="order-total">
+                    <%= total.toFixed(2) %>
+                  </span></strong></td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
 
     </div>
-  </div>
+</div>
+    <%- include('partials/footer') %>
+      <!-- Script function for quantity (+ and -) -->
+      <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const updateCartAndSummary = () => {
+            let grandTotal = 0;
 
-  <%- include('partials/footer') %>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            // Loop over each cart item
+            document.querySelectorAll('.cart-item').forEach((item, index) => {
+              const qtyInput = item.querySelector('.qty-input');
+              const unitPrice = parseFloat(item.querySelector('.unit-price').textContent);
+              const subtotalEl = item.querySelector('.subtotal');
+              const qty = parseInt(qtyInput.value) || 1;
+
+              const subtotal = (qty * unitPrice).toFixed(2);
+              subtotalEl.textContent = subtotal;
+
+              grandTotal += parseFloat(subtotal);
+
+              // Update corresponding row in summary table
+              const summaryRow = document.querySelectorAll('#summary-body tr')[index];
+              if (summaryRow) {
+                summaryRow.querySelector('.summary-qty').textContent = qty;
+                summaryRow.querySelector('.summary-subtotal').textContent = `$${subtotal}`;
+              }
+            });
+
+            // Update total in summary
+            const totalEl = document.getElementById('order-total');
+            totalEl.textContent = grandTotal.toFixed(2);
+          };
+
+          // Listen for +/- clicks
+          document.querySelectorAll('.qty-btn').forEach(button => {
+            button.addEventListener('click', () => {
+              const input = button.parentElement.querySelector('.qty-input');
+              let qty = parseInt(input.value) || 1;
+
+              if (button.classList.contains('plus')) {
+                qty++;
+              } else if (button.classList.contains('minus') && qty > 1) {
+                qty--;
+              }
+
+              input.value = qty;
+              updateCartAndSummary();
+            });
+          });
+
+          // Also allow manual input
+          document.querySelectorAll('.qty-input').forEach(input => {
+            input.addEventListener('change', updateCartAndSummary);
+          });
+        });
+      </script>
+
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

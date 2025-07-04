@@ -283,30 +283,81 @@
   background-color: #B32748;
 }
 /*checkout*/
+.checkout{
+  background: linear-gradient(to right, #6f42c1, #e83e8c);
+  color: white;
+  padding: 40px 0;
+  padding-top: 120px;
+  text-align: center;
+}
 .checkout-container {
+  padding-top: 50px;
+  /* space below navbar */
   display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  margin-top: 50px;
+  justify-content: center;
 }
-.plc .mb-3 input{
-  width: 30%;
+
+.checkout-header {
+  margin-bottom: 30px;
+  width: 40%;
 }
-.checkout-container h5{
+.checkout-cart-summary {
+  width: 60%;
+}
+.checkout-cart h3{
+  font-weight: bold;
+  align-items: center;
+  line-height: 1.5;
+  font-size: 1rem;
+  text-transform: uppercase;
+  border-bottom: 4px #f2f2f2 solid;
+  padding-bottom: 14px;
+  margin: 1rem 0;
+  font-weight: 700 !important;
+}
+
+.item-image img {
+  width: 100px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.item-info small{
+  padding : 5px;
+}
+.input-group{
+  width: 130px;
+  padding-top: 10px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+.plc .mb-3 .form-control{
+  
+  height: auto;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+.plc h5{
   font-weight: bolder;
+  align-items: center;
   line-height: 1.5;
   text-align: center;
   font-size: 1rem;
   text-transform: uppercase;
   border-bottom: 4px #f2f2f2 solid;
-  width: 30%;
   padding-bottom: 14px;
   margin: 1rem 0;
   font-weight: 700 !important;
 }
-.checkout-container .btn{
+.plc .btn{
   color: #fff;
-  width: 30%;
   text-transform: uppercase;
   background-color: #B32748;
   font-weight: bolder;
@@ -316,7 +367,7 @@
   align-items: center;
   text-align: center;
   margin: 20px 0;
-  width: 30%;
+  
 }
 
 .hr-or::before,
@@ -340,16 +391,24 @@
   
 }
 
-.checkout-main {
-  flex: 1;
-  min-width: 300px;
+.guest-container .guest {
+  color: #fff;
+  text-transform: uppercase;
+  background-color: #B32748;
+  font-weight: bolder;
+  margin-top: 20px;
 }
-.guest-container input{
-  
+.checkout-cart {
+  width: 100%;
+  max-width: 600px;
+  margin-left: 20px;
+  padding-bottom: 20px;
 }
 .checkout-summary {
+  padding-top: 30px;
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
+  margin-left: 20px;
 }
 
 /* login navbar */
