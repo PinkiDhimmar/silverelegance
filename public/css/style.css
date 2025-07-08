@@ -22,6 +22,12 @@
   font-size: 18px;
   color: #B32748;
 }
+.badge {
+  font-size: 0.6rem;
+  padding: 0.25em 0.45em;
+  line-height: 1;
+  
+}
 
 /*slider*/
 .w-100 {
@@ -291,18 +297,18 @@
   text-align: center;
 }
 .checkout-container {
-  padding-top: 50px;
-  /* space below navbar */
+  padding-top: 50px;/* space below navbar */
   display: flex;
   justify-content: center;
 }
 
 .checkout-header {
   margin-bottom: 30px;
-  width: 40%;
+  width: 50%;
 }
 .checkout-cart-summary {
-  width: 60%;
+  width: 50%;
+  justify-content: center;
 }
 .checkout-cart h3{
   font-weight: bold;

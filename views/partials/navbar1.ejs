@@ -43,14 +43,21 @@
  </ul>
  
   </div>
- <div class="navbar-nav right">
+ <div class="navbar-nav right position-relative">
     <a href="#" class="icon-link" onclick="toggleUserPanel()"><i class="bi bi-person me-3"></i></a>
+    
     <a href="/cart" class="icon-link"><i class="bi bi-cart me-3"></i>
-      <% if (cartCount > 0) { %>
-      <span class="badge bg-danger"><%= cartCount %></span>
-      <% } %>
+       <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
+              <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                <%= cartCount %>
+              </span>
+            <% } %> 
     </a>
-    <a href="/wishlist" class="icon-link"><i class="bi bi-heart me-3"></i></a>
+    <a href="/wishlist" class="icon-link position-relative"><i class="bi bi-heart me-3"></i>
+      <% if (wishlistCount > 0) { %>
+      <span class="badge bg-danger rounded-pill position-absolute translate-middle top-0 start-100"><%= wishlistCount %></span>
+    <% } %>
+    </a>
  </div>
  <!-- Right-side login/user panel -->
 <div id="userPanel" class="side-panel">
