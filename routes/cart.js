@@ -40,7 +40,7 @@ router.post('/cart/add', (req, res) => {
         // Insert new
         const insertSql = 'INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)';
         conn.query(insertSql, [user.id, id, qty], () => {
-          return res.redirect('/checkout');
+          return res.redirect('/cart');
         });
       }
     });
@@ -62,7 +62,7 @@ router.post('/cart/add', (req, res) => {
         image
       });
     }
-    res.redirect('/checkout');
+    res.redirect('/cart');
   }
 });
 
