@@ -79,7 +79,7 @@ router.post('/cart/remove/:id', (req, res) => {
         console.error('DB cart remove error:', err);
         return res.status(500).send('Error removing item from cart');
       }
-      return res.redirect('/checkout');
+      return res.redirect('/cart');
     });
   } else {
     // Guest user → remove from session cart
@@ -111,8 +111,10 @@ router.get('/cart', (req, res) => {
       WHERE c.user_id = ?
     `;
     conn.query(sql, [user.id], (err, results) => {
+      if (err){
       console.error('DB Cart Load Error:', err);
-      if (err) return res.send('Error loading cart');
+      return res.send('Error loading cart');
+      }
       res.render('cart', { cart: results || [], user });
     });
   } else {
