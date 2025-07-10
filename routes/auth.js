@@ -36,7 +36,12 @@ router.post('/login', (req, res) => {
 
     const user = results[0];
     if (user && user.password === password) {
-      req.session.user = user;
+      req.session.user = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      };
       return res.redirect(redirect);
     } else {
       return res.send('Invalid login');

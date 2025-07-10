@@ -83,9 +83,12 @@ router.get('/customer/order-details/:id', ensureCustomer, (req, res) => {
 router.get('/customer/address', ensureCustomer, (req, res) => {
   const userId = req.session.user.id;
 
-  conn.query('SELECT * FROM users WHERE id = ?', [userId], (err, results) => {
-    if (err || results.length === 0) return res.send('User not found');
-
+  const sql = 'SELECT address, city, postal_code, country FROM users WHERE id = ?';
+  conn.query(sql, [userId], (err, results) => {
+    if (err) throw err;
+  if (results.length === 0) {
+      return res.redirect('/customer/dashboard?error=' + encodeURIComponent('User not found.'));
+    }
     res.render('customer/address', {
       user: results[0],
       message: req.query.message || null,
@@ -98,8 +101,7 @@ router.post('/customer/update-address', ensureCustomer, (req, res) => {
   const userId = req.session.user.id;
   const { address, city, postal_code, country } = req.body;
 
-  conn.query(
-    'UPDATE users SET address=?, city=?, postal_code=?, country=? WHERE id=?',
+  conn.query('UPDATE users SET address=?, city=?, postal_code=?, country=? WHERE id=?',
     [address, city, postal_code, country, userId],
     (err) => {
       if (err) return res.send('Failed to update address');
