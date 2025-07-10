@@ -720,3 +720,12 @@ position: relative;
   height: 100%;
   border: 0;
 }
+/*checkout stripe */
+#stripe-section {
+  transition: all 0.3s ease;
+}
+
+img.payment-logo {
+  max-height: 32px;
+  object-fit: contain;
+}

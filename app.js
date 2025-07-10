@@ -13,6 +13,8 @@ const path = require('path');
 const app = express();
 const conn = require('./dbConfig');
 
+require('dotenv').config();
+
 // Multer setup for image uploads
 const storage = multer.diskStorage({
   destination: 'uploads/',
