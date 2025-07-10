@@ -66,6 +66,7 @@
     <h3 class="w">Welcome, <%= session.user.name %></h3>
     <p class="e">Email: <%= session.user.email %></p>
     <a href="/logout" class="l">Logout</a>
+    <a href="/customer-dashboard" class="cd">My Dashboard</a>
   <% } else { %>
     <h3> MEMBER LOGIN </h3>
     <form action="/login" method="POST">

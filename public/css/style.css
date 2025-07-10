@@ -543,6 +543,14 @@
   color: #B32748;
   font-weight: 20px;
 }
+.side-panel .cd{
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+  border: 1px solid #B32748;
+  background-color: #B32748;
+  text-decoration: none;
+}
 .side-panel.open {
   right: 0;
 }
