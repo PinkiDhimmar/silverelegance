@@ -113,7 +113,18 @@ app.use(contactRoutes);
 
 // Home page
 app.get('/', (req, res) => {
-  res.render('home');
+  const newProductSql = `SELECT * FROM products
+    WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+    ORDER BY created_at DESC
+    LIMIT 8`;
+
+  conn.query(newProductSql, (err, newProducts) => {
+    if (err) throw err;
+
+    res.render('home', {
+      newProducts
+    });
+  });
 });
 
 // Logout
