@@ -130,28 +130,24 @@ router.post('/customer/change-password', ensureCustomer, (req, res) => {
       return res.redirect('/customer/change-password?error=' + encodeURIComponent('User not found.'));
     }
 
-    const hashedPasswordFromDB = results[0].password;
+    const passwordFromDB = results[0].password;
 
-    bcrypt.compare(current_password, hashedPasswordFromDB, (err, isMatch) => {
-      if (err || !isMatch) {
-        return res.redirect('/customer/change-password?error=' + encodeURIComponent('Current password is incorrect.'));
+    // Plain text password check
+    if (current_password !== passwordFromDB) {
+      return res.redirect('/customer/change-password?error=' + encodeURIComponent('Current password is incorrect.'));
+    }
+
+    // Update password directly (no hashing)
+    conn.query('UPDATE users SET password = ? WHERE id = ?', [new_password, userId], (err2) => {
+      if (err2) {
+        return res.redirect('/customer/change-password?error=' + encodeURIComponent('Failed to update password.'));
       }
 
-      bcrypt.hash(new_password, 10, (err, hashedNewPassword) => {
-        if (err) {
-          return res.redirect('/customer/change-password?error=' + encodeURIComponent('Error encrypting new password.'));
-        }
-
-        conn.query('UPDATE users SET password = ? WHERE id = ?', [hashedNewPassword, userId], (err2) => {
-          if (err2) {
-            return res.redirect('/customer/change-password?error=' + encodeURIComponent('Failed to update password.'));
-          }
-
-          res.redirect('/customer/change-password?message=' + encodeURIComponent('Password updated successfully.'));
-        });
-      });
+      res.redirect('/customer/change-password?message=' + encodeURIComponent('Password updated successfully.'));
     });
   });
 });
+
+
 
 module.exports = router;
