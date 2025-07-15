@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const conn = require('../dbConfig');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // Utility to calculate total
 function calculateTotal(cart) {
@@ -39,11 +40,9 @@ router.get('/checkout', (req, res) => {
   } else {
     const cart = req.session.cart || [];
     const total = cart.reduce((sum, item) => sum + item.quantity * item.price, 0);
-    res.render('checkout', { cart, user: null,  guest: guest || null, total });
+    res.render('checkout', { cart, user: null,  guest: guest || null, total});
   }
 });
-
-
 
 // POST: Guest checkout (sets session user temporarily)
 router.post('/checkout/guest', (req, res) => {
@@ -60,7 +59,30 @@ router.post('/checkout/guest', (req, res) => {
 
 
 // POST: Logged-in user places order (database cart)
-router.post('/checkout/place-order', (req, res) => {
+router.post('/create-payment-intent', async (req, res) => {
+  const { amount } = req.body;
+
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error('STRIPE_SECRET_KEY not configured');
+    return res.status(500).json({ error: 'Stripe not configured.' });
+  }
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount, // Make sure this is a number like 1000 (for $10.00)
+      currency: 'nzd',
+      automatic_payment_methods: { enabled: true },
+    });
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (err) {
+    console.error('Stripe error:', err);
+    res.status(500).json({ error: 'Failed to create payment intent.' });
+  }
+});
+
+
+// Place Order (after Stripe payment succeeds)
+router.post('/checkout/place-order', async (req, res) => {
   const user = req.session.user || null;
   const guest = req.session.guest || null;
 
@@ -71,6 +93,8 @@ router.post('/checkout/place-order', (req, res) => {
     city,
     postal_code,
     payment_method,
+    stripePaymentIntentId,
+    shipping_method
   } = req.body;
 
   const isLoggedIn = user && user.id;
@@ -78,128 +102,113 @@ router.post('/checkout/place-order', (req, res) => {
   const email = isLoggedIn ? user.email : (guestEmail || (guest && guest.email));
   const userId = isLoggedIn ? user.id : null;
 
-  if (!name || !email || !address || !city || !postal_code || !payment_method) {
+  if (!name || !email || !payment_method || !stripePaymentIntentId) {
     return res.send('Please fill in all required fields.');
   }
 
-  if (isLoggedIn) {
-    // For logged-in user, fetch cart from database
-    const sql = `
-      SELECT c.product_id, c.quantity, p.price
-      FROM cart c
-      JOIN products p ON c.product_id = p.id
-      WHERE c.user_id = ?
-    `;
-    conn.query(sql, [userId], (err, cartItems) => {
-      if (err) {
-        console.error('Error fetching cart from DB:', err);
-        return res.send('Error fetching cart.');
-      }
-      if (!cartItems.length) return res.send('Cart is empty.');
+  if (shipping_method === 'ship') {
+    if (!address || !city || !postal_code) {
+      return res.send('Please fill in all required shipping address fields.');
+    }
+  }
 
-      const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  let paymentStatus = 'pending';
+  let paymentId = null;
+  let paymentDetails = null;
 
-      const orderSql = `
-        INSERT INTO orders
-          (user_id, customer_name, email, address, city, postal_code, total_amount, payment_method, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-      `;
-      conn.query(orderSql, [userId, name, email, address, city, postal_code, total, payment_method], (err2, result) => {
-        if (err2) {
-          console.error('Order insert error:', err2);
-          return res.send('Error placing order.');
-        }
+  try {
+    const paymentIntent = await stripe.paymentIntents.retrieve(stripePaymentIntentId);
+    paymentStatus = paymentIntent.status;
+    paymentId = paymentIntent.id;
+    paymentDetails = JSON.stringify(paymentIntent);
+  } catch (err) {
+    console.error('Stripe verification failed:', err);
+    return res.send('Payment verification failed.');
+  }
 
-        const orderId = result.insertId;
-        const itemsSql = `INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ?`;
-        const itemsValues = cartItems.map(item => [
-          orderId,
-          item.product_id,
-          item.quantity,
-          item.price,
-        ]);
-
-        conn.query(itemsSql, [itemsValues], (err3) => {
-          if (err3) {
-            console.error('Order items insert error:', err3);
-            return res.send('Error saving order items.');
-          }
-
-          // Clear DB cart after successful order
-          conn.query('DELETE FROM cart WHERE user_id = ?', [userId], (err4) => {
-            if (err4) {
-              console.error('Error clearing cart:', err4);
-              return res.send('Error clearing cart.');
-            }
-
-            res.send(`✅ Order placed successfully! Your order ID is ${orderId}`);
-          });
+  const cartPromise = isLoggedIn
+    ? new Promise((resolve, reject) => {
+        const sql = `SELECT c.product_id, c.quantity, p.price FROM cart c
+                      JOIN products p ON c.product_id = p.id WHERE c.user_id = ?`;
+        conn.query(sql, [userId], (err, result) => {
+          if (err) return reject(err);
+          resolve(result);
         });
-      });
-    });
+      })
+    : Promise.resolve(req.session.cart || []);
 
-  } else {
-    // Guest user: use cart from session
-    const cart = req.session.cart || [];
-    if (cart.length === 0) return res.send('Cart is empty.');
+  try {
+    const cartItems = await cartPromise;
+    if (!cartItems.length) return res.send('Cart is empty.');
 
-    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     const orderSql = `
-      INSERT INTO orders
-        (user_id, customer_name, email, address, city, postal_code, total_amount, payment_method, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-    `;
+      INSERT INTO orders (user_id, customer_name, email, address, city, postal_code, total_amount,
+        payment_method, status, payment_id, payment_details, shipping_method, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
 
-    conn.query(orderSql, [null, name, email, address, city, postal_code, total, payment_method], (err, result) => {
-      if (err) {
-        console.error('Order insert error:', err);
+    const orderParams = [
+      userId,
+      name,
+      email,
+      address,
+      city,
+      postal_code,
+      total,
+      payment_method,
+      paymentStatus,
+      paymentId,
+      paymentDetails,
+      shipping_method
+    ];
+
+    conn.query(orderSql, orderParams, (err2, result) => {
+      if (err2) {
+        console.error('Order insert error:', err2);
         return res.send('Error placing order.');
       }
 
       const orderId = result.insertId;
       const itemsSql = `INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ?`;
-      const itemsValues = cart.map(item => [
+      const itemsValues = cartItems.map(item => [
         orderId,
         item.product_id || item.id,
         item.quantity,
         item.price,
       ]);
 
-      conn.query(itemsSql, [itemsValues], (err2) => {
-        if (err2) {
-          console.error('Order items insert error:', err2);
+      conn.query(itemsSql, [itemsValues], (err3) => {
+        if (err3) {
+          console.error('Order items insert error:', err3);
           return res.send('Error saving order items.');
         }
 
-        // Clear session cart and guest info
-        req.session.cart = [];
-        req.session.guest = null;
-
-        res.send(`✅ Guest order placed successfully! Your order ID is ${orderId}`);
+        // Clear cart
+        if (isLoggedIn) {
+          conn.query('DELETE FROM cart WHERE user_id = ?', [userId], (err4) => {
+            if (err4) {
+              console.error('Error clearing cart:', err4);
+              return res.send('Error clearing cart.');
+            }
+            res.redirect(`/checkout/success?orderId=${orderId}`);
+          });
+        } else {
+          req.session.cart = [];
+          req.session.guest = null;
+          res.redirect(`/checkout/success?orderId=${orderId}`);
+        }
       });
     });
-  }
-});
-
-// Middleware to handle Stripe payment
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
-router.post('/create-payment-intent', async (req, res) => {
-  const { amount } = req.body;
-
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: 'nzd',
-      automatic_payment_methods: { enabled: true },
-    });
-
-    res.json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Checkout error:', err);
+    return res.send('An error occurred during checkout.');
   }
 });
 
+
+router.get('/checkout/success', (req, res) => {
+  res.render('checkout-success'); // Make sure this EJS view exists
+});
 
 module.exports = router;

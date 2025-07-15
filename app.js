@@ -24,6 +24,7 @@ const upload = multer({ storage });
 
 // View engine
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
