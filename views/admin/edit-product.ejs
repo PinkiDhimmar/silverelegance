@@ -45,6 +45,11 @@
       </div>
 
       <div class="mb-3">
+        <label class="form-label">Stock</label>
+        <input type="number" name="stock" class="form-control" value="<%= product.stock %>" required>
+      </div>
+
+      <div class="mb-3">
         <label class="form-label">Current Image</label><br>
         <img src="/uploads/<%= product.image %>" width="100" class="img-thumbnail">
       </div>
@@ -54,8 +59,8 @@
         <input type="file" name="image" class="form-control">
       </div>
 
-      <button type="submit" class="btn btn-primary">Update Product</button>
-      <a href="/admin/products" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn">Update Product</button>
+      <a href="/admin/products" class="btn">Cancel</a>
     </form>
   </div>
   </div>

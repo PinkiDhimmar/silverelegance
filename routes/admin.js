@@ -24,10 +24,8 @@ router.get('/admin/dashboard', (req, res) => {
 
 // View Products
 router.get('/admin/products', (req, res) => {
-  const sql = `
-    SELECT p.id, p.name, p.description, p.price, p.image, c.name AS category_name 
-    FROM products p LEFT JOIN categories c ON p.category_id = c.id
-  `;
+  const sql = `SELECT p.id, p.name, p.description, p.price, p.stock, p.image, c.name AS category_name 
+    FROM products p LEFT JOIN categories c ON p.category_id = c.id order by p.created_at DESC`;
   conn.query(sql, (err, results) => {
     if (err) throw err;
     res.render('admin/products', { products: results });
@@ -44,13 +42,13 @@ router.get('/admin/products/add', (req, res) => {
 
 // Add Product (POST)
 router.post('/admin/products/add', upload.single('image'), (req, res) => {
-  const { name, description, category_id, price } = req.body;
+  const { name, description, category_id, price, stock } = req.body;
   const image = req.file.filename;
   const sql = `
-    INSERT INTO products (name, description, category_id, price, image) 
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO products (name, description, category_id, price, stock, image) 
+    VALUES (?, ?, ?, ?, ?, ?)
   `;
-  conn.query(sql, [name, description, category_id, price, image], err => {
+  conn.query(sql, [name, description, category_id, price, stock, image], err => {
     if (err) throw err;
     res.redirect('/admin/products');
   });
@@ -73,21 +71,16 @@ router.get('/admin/products/edit/:id', (req, res) => {
 // Edit Product (POST)
 router.post('/admin/products/edit/:id', upload.single('image'), (req, res) => {
   const productId = req.params.id;
-  const { name, description, category_id, price } = req.body;
+  const { name, description, category_id, price, stock } = req.body;
 
   let sql, data;
   if (req.file) {
     const image = req.file.filename;
-    sql = `
-      UPDATE products SET name = ?, description = ?, category_id = ?, price = ?, image = ? 
-      WHERE id = ?
-    `;
-    data = [name, description, category_id, price, image, productId];
+    sql = `UPDATE products SET name = ?, description = ?, category_id = ?, price = ?, stock = ?, image = ? 
+            WHERE id = ?`;
+    data = [name, description, category_id, price, stock, image, productId];
   } else {
-    sql = `
-      UPDATE products SET name = ?, description = ?, category_id = ?, price = ? 
-      WHERE id = ?
-    `;
+    sql = `UPDATE products SET name = ?, description = ?, category_id = ?, price = ?, stock = ? WHERE id = ?`;
     data = [name, description, category_id, price, productId];
   }
 

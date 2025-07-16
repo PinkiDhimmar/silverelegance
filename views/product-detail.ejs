@@ -35,10 +35,15 @@
           <input type="hidden" name="image" value="<%= product.image %>">
           <div class="mb-3">
             <label for="quantity" class="form-label">Quantity</label>
-            <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control" />
+            <input type="number" name="quantity" id="quantity" value="0 " min="1" class="form-control <%= product.stock === 0 ? 'disabled' : '' %> "/>
           </div>
+           <% if (product.stock === 0) { %>
+            <button type="submit" class="btn" disabled>Sold Out</button>
+          <% } else { %>
           <button type="submit" class="btn">Add to Cart</button>
+          <% } %>
         </form>
+
       </div>
     </div>
   </div>

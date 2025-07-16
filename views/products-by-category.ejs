@@ -21,19 +21,29 @@
       <% } else { %>    
         <% products.forEach(product => { %>
           <div class="col-md-4 mb-4 mt-3">
-            <div class="card product-card h-100">
+            <div class="card pro-card h-100 <%= product.stock === 0 ? 'sold' : '' %>">
             <a href="/product/<%= product.id %>"> 
               <img src="/public/images/<%= product.image %>" class="card-img-top" alt="<%= product.name %>" />
             </a>
               <div class="card-body">
                 <h5 class="card-title"><%= product.name %></h5>
                 <p class="fw-bold text-primary">$<%= product.price.toFixed(2) %></p>
+                
+                <% if (product.stock === 0) { %> 
+                <span class="badge bg-danger mb-2">Sold Out</span>
+              <% } %>
+
                 <form action="/cart/add" method="POST">
                 <input type="hidden" name="productId" value="<%= product.id %>">
                 <input type="hidden" name="name" value="<%= product.name %>">
                 <input type="hidden" name="price" value="<%= product.price %>">
                 <a href="/product/<%= product.id %>" class="btn view">View Details</a>
+
+                <% if (product.stock > 0) { %>
                 <button type="submit" class="btn add">Add to Cart</button>
+                <% } else { %>
+                  <button type="button" class="btn" disabled>Out of Stock</button>
+                <% } %>
                 </form>
                 
               </div>

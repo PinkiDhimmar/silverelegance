@@ -31,6 +31,7 @@
               <th>Description</th>
               <th>Category</th>
               <th>Price ($)</th>
+              <th>Stock</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -43,6 +44,7 @@
                 <td><%= product.description %></td>
                 <td><%= product.category_name %></td>
                 <td>$ <%= product.price.toFixed(2) %></td>
+                <td><%= product.stock %></td>
                 <td>
                   <a href="/admin/products/edit/<%= product.id %>" class="btn btn-sm">Edit</a>
                   <a href="/admin/products/delete/<%= product.id %>" style="color: brown;" onclick="return confirm('Delete this product?')"><i class="bi bi-trash3"></i></a>

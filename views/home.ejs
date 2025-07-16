@@ -26,7 +26,7 @@
     </div>
     <div class="row">
         <div class="col-md-6">
-            <img src="/public/images/ring.jpg" class="img-fluid1" alt="ring">
+            <img src="/public/images/ring.jpg" class="img-fluid image1" alt="ring">
         </div>
         <div class="col-md-6">
             <h5 class="about-text"> Our Perfect Silver Jewellery</h5>
@@ -70,30 +70,50 @@
     </div>
 </div>
 <!--New Products-->
-<div class="container mt-5 py-5">
-    <div class="text-center py-5">
-        <h1>New Products</h1>
-        <div class="hr"></div>
-    </div>
-    <div class="row row-cols-2 row-cols-md-5 g-5">
-        <% newProducts.forEach(p => { %>
-        <div class="col">
-            <img src="/public/images/<%= p.image %>" class="card-img-top" alt="<%= p.name %>">
-            <div class="d flex justify-content-between p-3">
-            <h5 class="card-title"><%= p.name %></h5>
-            <p class="card-text">$<%= p.price %></p>
-            <a href="/product/<%= p.id %>" class="btn btn-primary btn-sm">View</a>
-            </div>
+<div class="container mt-5 py-5 position-relative">
+  <div class="text-center py-5">
+    <h1>New Products</h1>
+    <div class="hr"></div>
+  </div>
+
+  <!-- Scroll Buttons -->
+  <button class="scroll-btn left" onclick="scrollProducts(-1)">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+  <button class="scroll-btn right" onclick="scrollProducts(1)">
+    <i class="bi bi-chevron-right"></i>
+  </button>
+
+  <!-- Scrollable Row -->
+  <div class="product-scroll d-flex overflow-auto" id="productScroll">
+    <% newProducts.forEach(p => { %>
+      <div class="product-card card mx-2 flex-shrink-0" style="width: 200px;">
+        <img src="/public/images/<%= p.image %>" class="card-img-top" alt="<%= p.name %>">
+        <div class="card-body d-flex flex-column justify-content-between p-2">
+          <h5 class="card-title"><%= p.name %></h5>
+          <p class="card-text">$<%= p.price %></p>
+          <a href="/product/<%= p.id %>" class="btn btn-sm">View</a>
         </div>
-           <% }) %>
-    </div>
+      </div>
+    <% }) %>
+  </div>
 </div>
+
 <footer>
     <%- include('partials/footer.ejs') %>
     
 </footer>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            crossorigin="anonymous"></script>
+<script>
+function scrollProducts(direction) {
+  const container = document.getElementById("productScroll");
+  const scrollAmount = 220; // width of one card + margin
+  container.scrollBy({
+    left: direction * scrollAmount,
+    behavior: "smooth"
+  });
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 </body>
 
 </html>
