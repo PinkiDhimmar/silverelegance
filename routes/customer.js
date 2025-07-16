@@ -119,7 +119,7 @@ router.get('/customer/change-password', ensureCustomer, (req, res) => {
   });
 });
 
-router.post('/customer/change-password', ensureCustomer, (req, res) => {
+router.post('/customer/change-password', ensureCustomer, async (req, res) => {
   const userId = req.session.user.id;
   const { current_password, new_password, confirm_password } = req.body;
 
@@ -127,29 +127,32 @@ router.post('/customer/change-password', ensureCustomer, (req, res) => {
     return res.redirect('/customer/change-password?error=' + encodeURIComponent('New passwords do not match.'));
   }
 
-  conn.query('SELECT password FROM users WHERE id = ?', [userId], (err, results) => {
+  conn.query('SELECT password FROM users WHERE id = ?', [userId], async (err, results) => {
     if (err || results.length === 0) {
       return res.redirect('/customer/change-password?error=' + encodeURIComponent('User not found.'));
     }
 
-    const passwordFromDB = results[0].password;
+    const hashedPassword = results[0].password;
 
-    // Plain text password check
-    if (current_password !== passwordFromDB) {
+    const isMatch = await bcrypt.compare(current_password, hashedPassword);
+    if (!isMatch) {
       return res.redirect('/customer/change-password?error=' + encodeURIComponent('Current password is incorrect.'));
     }
 
-    // Update password directly (no hashing)
-    conn.query('UPDATE users SET password = ? WHERE id = ?', [new_password, userId], (err2) => {
-      if (err2) {
-        return res.redirect('/customer/change-password?error=' + encodeURIComponent('Failed to update password.'));
-      }
+    try {
+      const newHashedPassword = await bcrypt.hash(new_password, 12);
+      conn.query('UPDATE users SET password = ? WHERE id = ?', [newHashedPassword, userId], (err2) => {
+        if (err2) {
+          return res.redirect('/customer/change-password?error=' + encodeURIComponent('Failed to update password.'));
+        }
 
-      res.redirect('/customer/change-password?message=' + encodeURIComponent('Password updated successfully.'));
-    });
+        return res.redirect('/customer/change-password?message=' + encodeURIComponent('Password updated successfully.'));
+      });
+    } catch (error) {
+      console.error('Hashing error:', error);
+      return res.redirect('/customer/change-password?error=' + encodeURIComponent('Server error while updating password.'));
+    }
   });
 });
-
-
 
 module.exports = router;

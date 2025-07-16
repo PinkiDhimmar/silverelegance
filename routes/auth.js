@@ -10,17 +10,31 @@ router.get('/register', (req, res) => {
   res.render('register', { title: 'Register' });
 });
 
+// Register (GET)
+router.get('/register', (req, res) => {
+  res.render('register');
+});
+
 // Register (POST)
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
-  if (!email || !password) return res.send('Missing credentials');
+
+  if (!email || !password || !name) {
+    return res.send('All fields required');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 12); // 🔐 Hash password
 
   const sql = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, "customer")';
-  conn.query(sql, [name, email, password], (err) => {
-    if (err) throw err;
-    res.render('login');
+  conn.query(sql, [name, email, hashedPassword], (err) => {
+    if (err) {
+      console.error('Register error:', err);
+      return res.send('User already exists or DB error');
+    }
+    res.redirect('/login');
   });
 });
+
 
 // Login Page
 router.get('/login', (req, res) => {
@@ -29,22 +43,28 @@ router.get('/login', (req, res) => {
 
 // Login (POST)
 router.post('/login', (req, res) => {
-  const { email, password, redirect = '/dashboard' } = req.body;
+  const { email, password } = req.body;
 
-  conn.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
-    if (err) return res.send('DB error');
+  conn.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+    if (err) return res.send('Database error');
+
+    if (results.length === 0) {
+      return res.send('Invalid email or password');
+    }
 
     const user = results[0];
-    if (user && user.password === password) {
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (isMatch) {
       req.session.user = {
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role
       };
-      return res.redirect(redirect);
+      return res.redirect('/dashboard');
     } else {
-      return res.send('Invalid login');
+      return res.send('Invalid email or password');
     }
   });
 });
