@@ -10,23 +10,18 @@ router.get('/register', (req, res) => {
   res.render('register', { title: 'Register' });
 });
 
-// Register (GET)
-router.get('/register', (req, res) => {
-  res.render('register');
-});
-
 // Register (POST)
 router.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, address, city, postal_code, phone, DOB } = req.body;
 
-  if (!email || !password || !name) {
+  if (!email || !password || !name || !address || !city || !postal_code || !phone || !DOB) {
     return res.send('All fields required');
   }
 
   const hashedPassword = await bcrypt.hash(password, 12); // 🔐 Hash password
 
-  const sql = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, "customer")';
-  conn.query(sql, [name, email, hashedPassword], (err) => {
+  const sql = 'INSERT INTO users (name, email, password, role, DOB, address, city, postal_code, phone, country) VALUES (?, ?, ?, "customer", ?, ?, ?, ?, ?, "New Zealand")';
+  conn.query(sql, [name, email, hashedPassword, DOB, address, city, postal_code, phone], (err) => {
     if (err) {
       console.error('Register error:', err);
       return res.send('User already exists or DB error');

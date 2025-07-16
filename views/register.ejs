@@ -15,19 +15,34 @@
 			<form action="/register" method="post">
                 <h1>Register</h1>
                 <p>Complete the form below to Register</p><br>
+
                 <p style="font-weight: bold; text-align: left;">PERSONAL DETAILS</p>
                 <input type="text" name="name" placeholder="Full Name*" id="name" required>                
 				<input type="text" name="email" placeholder="Email*" id="email" required><br>
+
+
                 <p style="font-weight: bold; text-align: left;">DATE OF BIRTH</p>
-                <input type="date" name="dob" placeholder="Date of Birth" id="dob" required><br>
+                <input type="date" name="DOB" placeholder="Date of Birth" id="DOB" required><br>
+
                 <p style="font-weight: bold; text-align: left;">LOCATION</p>
-                <input type="text" name="address" placeholder="Address*" id="address" required><br>
+                <input id="address" name="address" type="text" class="form-control" placeholder="Start typing address" autocomplete="off" required>
+                <input id="city" name="city" type="text" class="form-control mt-2" placeholder="City*" required>
+                <input id="postal_code" name="postal_code" type="text" class="form-control mt-2" placeholder="Postal Code*" required>
+                <input id="country" name="country" type="text" class="form-control mt-2" placeholder="New Zealand" readonly>
+                
+                <p style="font-weight: bold; text-align: left;">CONTACT DETAILS</p>
+                <input type="text" name="phone" placeholder="Mobile Number*" id="phone" required><br>
+
                 <p style="font-weight: bold; text-align: left;">PASSWORD</p>
                 <p style="text-align: left;">7 characters minimum, must include a capital letter, no space</p>
 				<input type="password" name="password" placeholder="Password*" id="password" required>
                 <input type="password" name="confirmPassword" placeholder="Confirm Password*" id="confirmPassword" required>
-                <input type="checkbox" name="terms" id="signup" class="terms" required>
-                <p>Agree to the <a href="/terms">Terms and Conditions</a></p>
+               
+                <label class="checkbox-label">
+                    <input type="checkbox" name="terms" required>
+                    <span>I agree to the <a href="/terms" target="_blank">Terms and Conditions</a></span>
+                </label>
+            
                 <button type="submit" class="btn-register">CREATE ACCOUNT</button><br>
                 <p>Already have an account? <a href="/login">Login into your account</a></p>
                 
