@@ -100,4 +100,55 @@ router.post('/cart/wishlist/:productId', (req, res) => {
   });
 });
 
+// Move item from wishlist to cart
+router.post('/wishlist/move-to-cart', (req, res) => {
+  const userId = req.session.user?.id;
+  const productId = req.body.productId;
+
+  if (!userId) {
+    return res.status(401).send('Login required.');
+  }
+
+                  // Remove from wishlist
+  const deleteSql = 'DELETE FROM wishlist WHERE user_id = ? AND product_id = ?';
+  conn.query(deleteSql, [userId, productId], (deleteErr) => {
+    if (deleteErr) {
+      console.error('Error deleting from wishlist:', deleteErr);
+      return res.status(500).send('Error moving item.');
+    }
+
+                  // Add to cart
+    const checkSql = 'SELECT * FROM cart WHERE user_id = ? AND product_id = ?';
+    conn.query(checkSql, [userId, productId], (checkErr, rows) => {
+      if (checkErr) {
+        console.error('Error checking cart:', checkErr);
+        return res.status(500).send('Error checking cart.');
+      }
+
+      if (rows.length > 0) {
+        // Already in cart – update quantity
+        const updateSql = 'UPDATE cart SET quantity = quantity + 1 WHERE user_id = ? AND product_id = ?';
+        conn.query(updateSql, [userId, productId], (updateErr) => {
+          if (updateErr) {
+            console.error('Error updating cart:', updateErr);
+            return res.status(500).send('Error updating cart.');
+          }
+          return res.redirect('/cart');
+        });
+      } else {
+        // Not in cart – insert new
+        const insertSql = 'INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, 1)';
+        conn.query(insertSql, [userId, productId], (insertErr) => {
+          if (insertErr) {
+            console.error('Error inserting into cart:', insertErr);
+            return res.status(500).send('Error adding to cart.');
+          }
+          return res.redirect('/cart');
+        });
+      }
+    });
+  });
+});
+
+
 module.exports = router;

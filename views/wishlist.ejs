@@ -25,18 +25,19 @@
         <div class="col-md-4">
           <div class="card mb-3">
             <img src="/uploads/<%= item.image %>" class="card-img-top" alt="<%= item.name %>">
-            <div class="card-body">
+            <div class="card-body wishlist-item">
               <h5 class="card-title"><%= item.name %></h5>
               <p class="card-text">$<%= item.price.toFixed(2) %></p>
-              <a href="/product/<%= item.id %>" class="btn btn-primary btn-sm">View</a>
-              <form method="POST" action="/wishlist/remove/<%= item.wishlist_id %>" class="d-inline">
-                <button class="btn btn-danger btn-sm">Remove</button>
-              </form>
+              <div class="d-flex justify-content-between">
+              <a href="/product/<%= item.id %>" class="btn view">View</a>
                 <form method="POST" action="/wishlist/move-to-cart">
-                <input type="hidden" name="product_id" value="<%= item.id %>">
-                <button type="submit" class="btn btn-outline-primary btn-sm">Move to Cart</button>
+                <input type="hidden" name="productId" value="<%= item.id %>">
+                <button type="submit" class="btn cart">Move to Cart</button>
                 </form>
-
+               <form method="POST" action="/wishlist/remove/<%= item.wishlist_id %>" class="d-inline">
+                <button class="btn trash"><i class="bi bi-trash3"></i></button>
+              </form>
+              </div>
             </div>
           </div>
         </div>
