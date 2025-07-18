@@ -841,6 +841,14 @@ img.payment-logo {
   padding-top: 100%;
   margin-top: 100px;
 }
+.checkout-success .shopping {
+  color: #B32748;
+  font-weight: bold;
+  padding: 10px 20px;
+  cursor: pointer;
+  border: 1px solid #B32748;
+  border-radius: 6px;
+}
 /* forgot password */
 .container-forgotpass {
   padding-top: 110px; /* space below navbar */

@@ -94,24 +94,26 @@ router.post('/checkout/place-order', async (req, res) => {
     postal_code,
     payment_method,
     stripePaymentIntentId,
-    shipping_method
+    shipping_method,
+    courier_fee
   } = req.body;
 
   const isLoggedIn = user && user.id;
   const name = isLoggedIn ? user.name : (guestName || (guest && guest.name));
   const email = isLoggedIn ? user.email : (guestEmail || (guest && guest.email));
   const userId = isLoggedIn ? user.id : null;
-
-  if (!name || !email || !payment_method || !stripePaymentIntentId) {
+console.log('Form body:', req.body);
+  if (!name || !email || !payment_method || !stripePaymentIntentId || !shipping_method) {
     return res.send('Please fill in all required fields.');
   }
+
 
   if (shipping_method === 'ship') {
     if (!address || !city || !postal_code) {
       return res.send('Please fill in all required shipping address fields.');
     }
   }
-
+  const parsedCourierFee = parseFloat(courier_fee || 0);
   let paymentStatus = 'pending';
   let paymentId = null;
   let paymentDetails = null;
@@ -144,9 +146,9 @@ router.post('/checkout/place-order', async (req, res) => {
     const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     const orderSql = `
-      INSERT INTO orders (user_id, customer_name, email, address, city, postal_code, total_amount,
+      INSERT INTO orders (user_id, customer_name, email, address, city, postal_code, total_amount, courier_fee,
         payment_method, status, payment_id, payment_details, shipping_method, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
 
     const orderParams = [
       userId,
@@ -156,6 +158,7 @@ router.post('/checkout/place-order', async (req, res) => {
       city,
       postal_code,
       total,
+      parsedCourierFee,
       payment_method,
       paymentStatus,
       paymentId,
