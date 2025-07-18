@@ -179,7 +179,10 @@ router.post('/reset-password', async (req, res) => {
   });
 });
 
-
+// Terms and Conditions Page
+router.get('/terms&condition', (req, res) => {
+  res.render('terms&condition', { title: 'Terms and Conditions' });
+});
 // Logout
 router.get('/logout', (req, res) => {
   req.session.destroy();

@@ -209,9 +209,23 @@ router.get('/admin/order-details/:id', (req, res) => {
 // Update Order
 router.post('/admin/update-order/:id', (req, res) => {
   const { status, courier_name, tracking_number } = req.body;
-  conn.query(
-    `UPDATE orders SET status = ?, courier_name = ?, tracking_number = ? WHERE id = ?`,
-    [status, courier_name, tracking_number, req.params.id],
+  let tracking_link = '';
+
+  switch (courier_name) {
+    case 'nzpost':
+      tracking_link = `https://www.nzpost.co.nz/tools/tracking?track=${encodeURIComponent(tracking_number)}`;
+      break;
+    case 'aramex':
+      tracking_link = `https://www.aramex.com/track/shipments?ShipmentNumber=${encodeURIComponent(tracking_number)}`;
+      break;
+    case 'dhl':
+      tracking_link = `https://www.dhl.com/nz-en/home/tracking.html?tracking-id=${encodeURIComponent(tracking_number)}`;
+      break;
+    default:
+      tracking_link = ''; // fallback or error
+  }
+  conn.query(`UPDATE orders SET status = ?, courier_name = ?, tracking_number = ?, tracking_link = ? WHERE id = ?`,
+    [status, courier_name, tracking_number, tracking_link, req.params.id],
     err => {
       if (err) return res.send('Failed to update order');
       res.redirect(`/admin/order-details/${req.params.id}?message=Order updated successfully`);

@@ -34,7 +34,12 @@
         </select>
         
         <label>Courier Name</label>
-        <input type="text" name="courier_name" value="<%= order.courier_name || '' %>" class="form-control mb-2">
+        <select name="courier_name" id="courier_name" class="form-control" required>
+          <option value="">-- Select Courier --</option>
+          <option value="nzpost" <%= order.courier === 'nzpost' ? 'selected' : '' %>>NZ Post</option>
+          <option value="aramex" <%= order.courier === 'aramex' ? 'selected' : '' %>>Aramex</option>
+          <option value="dhl" <%= order.courier === 'dhl' ? 'selected' : '' %>>DHL</option>
+        </select>
 
         <label>Tracking Number</label>
         <input type="text" name="tracking_number" value="<%= order.tracking_number || '' %>" class="form-control mb-2">
