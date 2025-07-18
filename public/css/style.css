@@ -28,7 +28,40 @@
   line-height: 1;
   
 }
+/*navbar search*/
+  .search-toggle {
+    display: none;
+  }
 
+  .search-form {
+    display: none;
+    transition: width 0.3s ease;
+    width: 0;
+    overflow: hidden;
+  }
+
+  .search-toggle:checked + label + form.search-form {
+    display: inline-block;
+    width: 200px;
+  }
+
+  .search-icon-btn {
+    background: none;
+    border: none;
+  }
+  /*search Results*/
+  .container-search-results {
+    margin-top: 120px;
+  }
+  .btn-view {
+    color: #B32748;
+    border: 1px solid #B32748;
+    font-weight: bold;
+  }
+  .btn-view:hover {
+    background-color: #B32748;
+    color: #fff;
+  }
 /*slider*/
 .w-100 {
   height: 550px !important;

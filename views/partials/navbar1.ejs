@@ -44,8 +44,21 @@
  
   </div>
  <div class="d-flex align-items-center ms-auto">
+<!-- Hidden checkbox to toggle -->
+  <input type="checkbox" id="searchToggle" class="search-toggle">
+
+  <!-- Label = clickable icon -->
+  <label for="searchToggle" class="search-icon-btn">
+    <i class="bi bi-search me-3"></i>
+  </label>
+
+  <!-- Search form -->
+  <form action="/search" method="GET" class="search-form ms-2">
+    <input type="text" name="q" class="form-control form-control-sm" placeholder="Search products...">
+  </form>
+  <!-- login icons -->
     <a href="#" class="icon-link" onclick="toggleUserPanel()"><i class="bi bi-person me-3"></i></a>
-    
+  <!--cart icon-->
     <a href="/cart" class="icon-link"><i class="bi bi-cart me-3"></i>
        <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
               <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -53,6 +66,7 @@
               </span>
             <% } %> 
     </a>
+  <!--wishlist icon-->
     <a href="/wishlist" class="icon-link position-relative"><i class="bi bi-heart me-3"></i>
       <% if (wishlistCount > 0) { %>
       <span class="badge bg-danger rounded-pill position-absolute translate-middle top-0 start-100"><%= wishlistCount %></span>

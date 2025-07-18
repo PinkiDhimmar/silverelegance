@@ -172,7 +172,7 @@ router.get('/admin/orders', (req, res) => {
   }
 
   const sql = `
-    SELECT o.id, o.total_amount, o.status, o.created_at, u.name 
+    SELECT o.id, o.total_amount, o.payment_method, o.created_at, u.name 
     FROM orders o JOIN users u ON o.user_id = u.id
   `;
   conn.query(sql, (err, results) => {
@@ -208,10 +208,10 @@ router.get('/admin/order-details/:id', (req, res) => {
 
 // Update Order
 router.post('/admin/update-order/:id', (req, res) => {
-  const { status, payment_status, payment_method, tracking_number } = req.body;
+  const { status, courier_name, tracking_number } = req.body;
   conn.query(
-    `UPDATE orders SET status = ?, payment_status = ?, payment_method = ?, tracking_number = ? WHERE id = ?`,
-    [status, payment_status, payment_method, tracking_number, req.params.id],
+    `UPDATE orders SET status = ?, courier_name = ?, tracking_number = ? WHERE id = ?`,
+    [status, courier_name, tracking_number, req.params.id],
     err => {
       if (err) return res.send('Failed to update order');
       res.redirect(`/admin/order-details/${req.params.id}?message=Order updated successfully`);

@@ -24,7 +24,7 @@
         <th>Order ID</th>
         <th>Customer</th>
         <th>Total</th>
-        <th>Status</th>
+        <th>payment Method</th>
         <th>Date</th>
         <th>Action</th>
       </tr>
@@ -35,7 +35,7 @@
           <td><%= order.id %></td>
           <td><%= order.name %></td>
           <td>$<%= order.total %></td>
-          <td><%= order.status %></td>
+          <td><%= order.payment_method %></td>
           <td><%= order.created_at.toISOString().slice(0, 10) %></td>
           <td>
             <a href="/admin/order-details/<%= order.id %>" class="btn btn-sm">View</a>

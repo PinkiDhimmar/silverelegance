@@ -103,6 +103,7 @@ const wishlistRoutes = require('./routes/wishlist');
 const checkoutRoutes = require('./routes/checkout');
 const productsRoutes = require('./routes/products');
 const contactRoutes = require('./routes/contact');
+const searchRoutes = require('./routes/search');
 
 // Use routes
 app.use(authRoutes);
@@ -113,6 +114,7 @@ app.use(wishlistRoutes);
 app.use(checkoutRoutes);
 app.use(productsRoutes);
 app.use(contactRoutes);
+app.use(searchRoutes);
 
 // Home page
 app.get('/', (req, res) => {
