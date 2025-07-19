@@ -104,6 +104,7 @@ const checkoutRoutes = require('./routes/checkout');
 const productsRoutes = require('./routes/products');
 const contactRoutes = require('./routes/contact');
 const searchRoutes = require('./routes/search');
+const saleRoutes = require('./routes/sale');
 
 // Use routes
 app.use(authRoutes);
@@ -115,6 +116,7 @@ app.use(checkoutRoutes);
 app.use(productsRoutes);
 app.use(contactRoutes);
 app.use(searchRoutes);
+app.use(saleRoutes);
 
 // Home page
 app.get('/', (req, res) => {

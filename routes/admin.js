@@ -286,5 +286,69 @@ router.post('/admin/messages/:id/reply', (req, res) => {
 function slugify(text) {
   return text.toString().toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
 }
+// show specials
+router.get('/admin/specials', (req, res) => {
+  const sql = `
+    SELECT id, name, price, discount_percent, special_event_name, special_ends_on, is_special_active
+    FROM products
+    WHERE is_special_active = 1
+    ORDER BY special_ends_on ASC`;
+
+  conn.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching specials:', err);
+      return res.status(500).send('Database error');
+    }
+    res.render('admin/specials', { specials: results, user: req.session.user || {} });
+  });
+});
+
+// Show add special form
+router.get('/admin/special-add', (req, res) => {
+  const sql = 'SELECT id, name FROM products';
+  conn.query(sql, (err, products) => {
+    if (err) throw err;
+    res.render('admin/special-add', { products, user: req.session.user });
+  });
+});
+
+// Handle Specials add special
+router.post('/admin/special-add', (req, res) => {
+  const { product_id, special_event_name, discount_percent, special_ends_on } = req.body;
+   const is_special_active = req.body.is_special_active ? 1 : 0;
+
+  const sql = `UPDATE products
+    SET special_event_name = ?,discount_percent=?, special_ends_on = ?, is_special_active = ?
+    WHERE id = ?`;
+
+  conn.query(sql, [special_event_name, discount_percent, special_ends_on, is_special_active, product_id], err => {
+    if (err) throw err;
+    res.redirect('/admin/specials');
+  });
+});
+
+// Show edit special form
+router.get('/admin/specials/edit/:id', (req, res) => {
+  const sql = `SELECT * FROM products WHERE id = ?`;
+  conn.query(sql, [req.params.id], (err, result) => {
+    if (err) throw err;
+    if (result.length === 0) return res.send("Not found");
+    res.render('admin/special-edit', { special: result[0] });
+  });
+});
+
+// Handle Specials update
+router.post('/admin/specials/edit/:id', (req, res) => {
+  const { special_event_name, discount_percent, special_ends_on, is_special_active } = req.body;
+  const sql = `
+    UPDATE products
+    SET special_event_name = ?, discount_percent = ?, special_ends_on = ?, is_special_active = ?
+    WHERE id = ?
+  `;
+  conn.query(sql, [special_event_name, discount_percent, special_ends_on, is_special_active, req.params.id], err => {
+    if (err) throw err;
+    res.redirect('/admin/specials');
+  });
+});
 
 module.exports = router;
