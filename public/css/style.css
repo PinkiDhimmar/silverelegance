@@ -312,7 +312,7 @@
   font-size: 14px;
 }
 
-.register-box input {
+.register-box .r {
   width: 70%;
   padding: 12px;
   margin: 10px 0;
@@ -342,25 +342,6 @@
   background-color: #8a5c7a;
 }
 
-.register-box .terms {
-  
-  cursor: pointer;
-}
-.checkbox-label {
-  display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    margin-top: 10px;
-    margin-bottom: 15px;
-}
-
-.checkbox-label input[type="checkbox"] {
-  margin: 0;
-}
-.register-box input[type="checkbox"] {
-  width: auto;
-}
 /* product by category */
 .pro-container {
   background: linear-gradient(to right, #6f42c1, #e83e8c);
