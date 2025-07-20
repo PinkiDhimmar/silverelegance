@@ -328,7 +328,7 @@ router.post('/admin/special-add', (req, res) => {
 });
 
 // Show edit special form
-router.get('/admin/specials/edit/:id', (req, res) => {
+router.get('/admin/special-edit/:id', (req, res) => {
   const sql = `SELECT * FROM products WHERE id = ?`;
   conn.query(sql, [req.params.id], (err, result) => {
     if (err) throw err;

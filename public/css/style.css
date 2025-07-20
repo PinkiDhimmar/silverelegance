@@ -63,6 +63,16 @@
     background-color: #B32748;
     color: #fff;
   }
+  /*sale*/
+  .container-sale .btn{
+    color: #B32748;
+    background-color: #fff;
+    border: #B32748 1px solid;
+  }
+  .container-sale .btn:hover{
+    color: #fff;
+    background-color:#B32748;
+  }
 /*slider*/
 .w-100 {
   height: 550px !important;

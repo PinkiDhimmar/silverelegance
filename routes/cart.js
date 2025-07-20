@@ -12,59 +12,68 @@ function initSessionCart(req) {
 
 // Add to cart (POST)
 router.post('/cart/add', (req, res) => {
-  const { productId, name, price, quantity, image, code } = req.body;
+  const { productId, name, price, discountedPrice, quantity, image, code, is_special_active, discount_percent } = req.body;
 
   const id = parseInt(productId, 10);
   const qty = parseInt(quantity, 10);
   const parsedPrice = parseFloat(price);
+  const parsedDiscountedPrice = parseFloat(discountedPrice);
   const user = req.session.user;
 
   if (!id || !name || isNaN(parsedPrice) || !qty || qty < 1 || !image) {
     return res.status(400).send('Invalid product data');
   }
 
-  // Logged-in user → store in DB
   if (user && user.id) {
     const checkSql = 'SELECT * FROM cart WHERE user_id = ? AND product_id = ?';
     conn.query(checkSql, [user.id, id], (err, results) => {
       if (err) return res.send('DB error');
 
       if (results.length > 0) {
-        // Update quantity
         const newQty = results[0].quantity + qty;
         const updateSql = 'UPDATE cart SET quantity = ? WHERE id = ?';
         conn.query(updateSql, [newQty, results[0].id], () => {
           return res.redirect('/checkout');
         });
       } else {
-        // Insert new
         const insertSql = 'INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)';
         conn.query(insertSql, [user.id, id, qty], () => {
           return res.redirect('/cart');
         });
       }
     });
-  }
-
-  // Guest → store in session
-  else {
+  } else {
     initSessionCart(req);
+
     const existing = req.session.cart.find(item => item.id === id);
+    const special = is_special_active === '1' || is_special_active === 1 || is_special_active === true;
+
+    const finalDiscountPercent = parseFloat(discount_percent) || 0;
+    const originalPrice = parsedPrice;
+    const discountPrice = (special && finalDiscountPercent > 0)
+      ? parseFloat((originalPrice - (originalPrice * finalDiscountPercent / 100)).toFixed(2))
+      : parsedDiscountedPrice || originalPrice;
+
     if (existing) {
       existing.quantity += qty;
     } else {
       req.session.cart.push({
         id,
         name,
-        price: parsedPrice,
         quantity: qty,
+        price: discountPrice,
+        original_price: originalPrice,
+        discount_percent: finalDiscountPercent,
+        is_special_active: special,
         code: code || '',
         image
       });
     }
+
     res.redirect('/cart');
   }
 });
+
 
 // Remove item from cart (POST)
 router.post('/cart/remove/:id', (req, res) => {
@@ -105,23 +114,41 @@ router.get('/cart', (req, res) => {
   const user = req.session.user;
 
   if (user && user.id) {
-    const sql = `
-      SELECT c.id, c.product_id, c.quantity, p.name, p.price, p.image
-      FROM cart c JOIN products p ON c.product_id = p.id
-      WHERE c.user_id = ?
-    `;
+    const sql = `SELECT c.id, c.product_id, c.quantity, p.name, p.price AS original_price, p.image,
+             p.is_special_active, p.discount_percent,
+             CASE 
+               WHEN p.is_special_active = 1 AND p.discount_percent > 0 
+               THEN ROUND(p.price - (p.price * p.discount_percent / 100), 2)
+               ELSE p.price
+             END AS discountedPrice
+            FROM cart c 
+            JOIN products p ON c.product_id = p.id 
+            WHERE c.user_id = ?`;
     conn.query(sql, [user.id], (err, results) => {
-      if (err){
-      console.error('DB Cart Load Error:', err);
-      return res.send('Error loading cart');
+      if (err) {
+        console.error('DB Cart Load Error:', err);
+        return res.send('Error loading cart');
       }
-      res.render('cart', { cart: results || [], user });
+
+  res.render('cart',{ cart: results || [], user });
     });
+        
   } else {
     const cart = req.session.cart || [];
+
+     cart.forEach(item => {
+      if (item.is_special_active && item.discount_percent > 0) {
+        item.discountedPrice = parseFloat(
+          (item.price - (item.price * item.discount_percent / 100)).toFixed(2)
+        );
+      } else {
+        item.discountedPrice = item.price;
+      }
+    });
     res.render('cart', { cart, user: null });
   }
 });
+
 
 // Update quantity of a cart item
 router.post('/cart/update/:id', (req, res) => {

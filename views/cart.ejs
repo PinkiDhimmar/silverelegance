@@ -30,7 +30,15 @@
             <div class="col-md-9">
               <div class="card-body">
                 <h5 class="card-title"><%= item.name %></h5>
-                <p class="card-text mb-1">$<%= item.price.toFixed(2) %></p>
+                <p class="card-text mb-1">
+                  <% if (item.is_special_active && item.discount_percent > 0) { %>
+                    <span class="text-muted text-decoration-line-through me-2">$<%= item.original_price.toFixed(2) %></span>
+                    <span class="text-danger fw-bold">$<%= item.discountedPrice.toFixed(2) %></span>
+                  <% } else { %>
+                   <span class="fw-bold"> $<%= item.price.toFixed(2) %></span>
+                  <% } %>
+                </p>
+
                 <p class="text-muted small mb-2">Code: <%= item.code || 'N/A' %></p>
 
                 <form action="/cart/update/<%= item.id %>" method="POST" class="d-inline">
@@ -62,8 +70,9 @@
         <ul class="list-group mb-3">
           <% let total = 0; %>
           <% cart.forEach(item => {
-               let subtotal = item.price * item.quantity;
-               total += subtotal;
+               let unitPrice = (item.is_special_active && item.discount_percent > 0) ? item.discountedPrice : item.price;
+                   let subtotal = unitPrice * item.quantity;
+                   total += subtotal;
           %>
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <%= item.name %> × <%= item.quantity %>

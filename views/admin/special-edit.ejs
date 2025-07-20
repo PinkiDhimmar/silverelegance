@@ -31,7 +31,7 @@
   <select name="discount_percent" id="discount_percent" class="form-select" required>
     <option value="">-- Select Discount --</option>
     <% for (let i = 10; i <= 90; i += 10) { %>
-      <option value="<%= i %>" <%= product.discount_percent == i ? 'selected' : '' %>>
+      <option value="<%= i %>" <%= special.discount_percent == i ? 'selected' : '' %>>
         <%= i %>% OFF
       </option>
     <% } %>
@@ -49,7 +49,7 @@
         <option value="0" <%= !special.is_special_active ? 'selected' : '' %>>No</option>
       </select>
     </div>
-    <button class="btn btn-primary">Update Special</button>
+    <button class="btn">Update Special</button>
   </form>
     </div>
 </div>

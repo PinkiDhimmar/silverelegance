@@ -20,10 +20,10 @@ router.get('/checkout', (req, res) => {
   const user = req.session.user;
   const guest = req.session.guest;
 
-
   if (user && user.id) {
     const sql = `
-      SELECT c.id, c.product_id, c.quantity, p.name, p.price, p.image
+      SELECT c.id, c.product_id, c.quantity, p.name, p.price, p.image,
+             p.is_special_active, p.discount_percent
       FROM cart c
       JOIN products p ON c.product_id = p.id
       WHERE c.user_id = ?
@@ -34,15 +34,39 @@ router.get('/checkout', (req, res) => {
         return res.send('Checkout error');
       }
 
-      const total = cartResults.reduce((sum, item) => sum + item.quantity * item.price, 0);
+      // Calculate discountedPrice
+      cartResults.forEach(item => {
+        if (item.is_special_active && item.discount_percent > 0) {
+          item.discountedPrice = +(item.price - (item.price * item.discount_percent / 100)).toFixed(2);
+        } else {
+          item.discountedPrice = item.price;
+        }
+      });
+
+      // Total using discounted price
+      const total = cartResults.reduce((sum, item) => {
+        return sum + item.quantity * item.discountedPrice;
+      }, 0);
+
       res.render('checkout', { cart: cartResults, user, guest: null, total });
     });
   } else {
     const cart = req.session.cart || [];
-    const total = cart.reduce((sum, item) => sum + item.quantity * item.price, 0);
-    res.render('checkout', { cart, user: null,  guest: guest || null, total});
+
+    // Discounted price for session cart
+    cart.forEach(item => {
+      if (item.is_special_active && item.discount_percent > 0) {
+        item.discountedPrice = +(item.price - (item.price * item.discount_percent / 100)).toFixed(2);
+      } else {
+        item.discountedPrice = item.price;
+      }
+    });
+
+    const total = cart.reduce((sum, item) => sum + item.quantity * item.discountedPrice, 0);
+    res.render('checkout', { cart, user: null, guest: guest || null, total });
   }
 });
+
 
 // POST: Guest checkout (sets session user temporarily)
 router.post('/checkout/guest', (req, res) => {
@@ -130,10 +154,19 @@ console.log('Form body:', req.body);
 
   const cartPromise = isLoggedIn
     ? new Promise((resolve, reject) => {
-        const sql = `SELECT c.product_id, c.quantity, p.price FROM cart c
-                      JOIN products p ON c.product_id = p.id WHERE c.user_id = ?`;
+        const sql = `SELECT c.product_id, c.quantity, p.price, p.discount_percent, p.is_special_active
+          FROM cart c
+          JOIN products p ON c.product_id = p.id
+          WHERE c.user_id = ?`;
         conn.query(sql, [userId], (err, result) => {
           if (err) return reject(err);
+           result.forEach(item => {
+            if (item.is_special_active && item.discount_percent > 0) {
+              item.discountedPrice = +(item.price - (item.price * item.discount_percent / 100)).toFixed(2);
+            } else {
+              item.discountedPrice = item.price;
+            }
+          });
           resolve(result);
         });
       })
@@ -143,7 +176,7 @@ console.log('Form body:', req.body);
     const cartItems = await cartPromise;
     if (!cartItems.length) return res.send('Cart is empty.');
 
-    const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const total = cartItems.reduce((sum, item) => sum + item.discountedPrice * item.quantity, 0);
 
     const orderSql = `
       INSERT INTO orders (user_id, customer_name, email, address, city, postal_code, total_amount, courier_fee,

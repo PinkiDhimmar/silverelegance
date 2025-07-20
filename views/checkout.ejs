@@ -159,7 +159,15 @@
                 </div>
                 <div class="item-info flex-grow-1">
                   <h6 class="mb-1"><%= item.name %></h6>
-                   <small>$<%= item.price.toFixed(2) %></small>
+                   <% if (item.is_special_active && item.discount_percent > 0) { %>
+                    <small>
+                      <span class="text-muted text-decoration-line-through me-1">$<%= item.price.toFixed(2) %></span>
+                      <span class="text-danger fw-bold">$<%= item.discountedPrice.toFixed(2) %></span>
+                    </small>
+                  <% } else { %>
+                    <small>$<%= item.price.toFixed(2) %></small>
+                  <% } %>
+
                 </div>
 
               </div>
@@ -190,7 +198,11 @@
                 <td class="summary-qty">
                   <%= item.quantity %>
                 </td>
-                <td class="summary-subtotal">$<%= (item.price * item.quantity).toFixed(2) %>
+                <% const itemSubtotal = (item.discountedPrice || item.price) * item.quantity; %>
+                <td class="summary-subtotal">
+                  $<%= itemSubtotal.toFixed(2) %>
+                </td>
+
                 </td>
               </tr>
               <% }) %>
