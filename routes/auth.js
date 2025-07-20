@@ -74,6 +74,21 @@ router.post('/login', (req, res) => {
           email: user.email,
           role: user.role
         };
+         // ✅ Merge guest session cart into DB cart
+        if (req.session.cart && req.session.cart.length > 0) {
+          const insertSQL = `
+            INSERT INTO cart (user_id, product_id, quantity)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+          `;
+
+          req.session.cart.forEach(item => {
+            conn.query(insertSQL, [user.id, item.id, item.quantity]);
+          });
+
+          // ✅ Clear session cart
+          req.session.cart = [];
+        }
         return res.redirect(redirectUrl);
       } else {
         return res.send('Invalid email or password');

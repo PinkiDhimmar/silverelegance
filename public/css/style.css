@@ -388,6 +388,15 @@
   color: #fff;
   background-color: #B32748;
 }
+.pd-container .addcart{
+  color: #fff;
+  background-color: #B32748;
+}
+.pd-container .addcart:hover{
+  color: #B32748;
+  background-color: #fff;
+  border: #B32748 1px solid;
+}
 /*cart*/
 .shopping{
   border: #B32748 1px solid;
@@ -407,8 +416,18 @@
   padding: 5px 10px;
   cursor: pointer;
 }
-
-.wishlist {
+.input-group .update{
+  color: #fff;
+  background-color: #B32748;
+  font-weight: bold;
+}
+.input-group .update:hover{
+  color: #B32748;
+  background-color: #fff;
+  border: #B32748 1px solid;
+  font-weight: bold;
+}
+.con-cart .wishlist {
   background-color: #fff;
   color: #B32748;
   font-weight: bold;
@@ -416,18 +435,18 @@
   padding: 5px 10px;
   cursor: pointer;
 }
-.wishlist:hover {
+.con-cart .wishlist:hover {
   background-color: #B32748;
   color: #fff;
 }
-.proceed-checkout {
+.con-os .proceed-checkout {
   background-color: #B32748;
   color: #fff;
   font-weight: bold;
   padding: 10px 20px;
   cursor: pointer;
 }
-.proceed-checkout:hover {
+.con-os .proceed-checkout:hover {
   background-color: #B32748;
   color: #fff;
 }
@@ -519,6 +538,12 @@
   background-color: #B32748;
   font-weight: bolder;
 }
+.plc .btn:hover{
+  background-color: #fff;
+  color: #B32748;
+  border: #B32748 1px solid;
+  font-weight: bold;
+}
 .hr-or {
   display: flex;
   align-items: center;
@@ -554,6 +579,12 @@
   background-color: #B32748;
   font-weight: bolder;
   margin-top: 20px;
+}
+.guest-container .guest:hover{
+ background-color: #fff;
+  color: #B32748;
+  border: #B32748 1px solid;
+  font-weight: bold; 
 }
 .checkout-cart {
   width: 100%;

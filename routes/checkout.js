@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const conn = require('../dbConfig');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const transporter = require('../utils/mailer');
 
 // Utility to calculate total
 function calculateTotal(cart) {
@@ -219,6 +220,22 @@ console.log('Form body:', req.body);
           console.error('Order items insert error:', err3);
           return res.send('Error saving order items.');
         }
+        
+         // Deduct stock
+     cartItems.forEach(item => {
+  const updateStockSql = `UPDATE products SET stock = stock - ?  WHERE id = ? AND stock >= ?`;
+  const orderedQty = item.quantity;
+  const productId = item.product_id || item.id; // fallback for guests
+
+
+  conn.query(updateStockSql, [orderedQty, productId, orderedQty], (err3, res3) => {
+    if (err3) {
+      console.error('Stock update error:', err3);
+    } else if (res3.affectedRows === 0) {
+      console.warn(`Stock not updated for product ID ${productId}. Possibly not enough stock.`);
+    }
+  });
+});
 
         // Clear cart
         if (isLoggedIn) {

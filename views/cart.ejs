@@ -28,7 +28,7 @@
               <img src="/public/images/<%= item.image %>" class="img-fluid rounded-start" alt="<%= item.name %>">
             </div>
             <div class="col-md-9">
-              <div class="card-body">
+              <div class="card-body con-cart">
                 <h5 class="card-title"><%= item.name %></h5>
                 <p class="card-text mb-1">
                   <% if (item.is_special_active && item.discount_percent > 0) { %>
@@ -65,7 +65,7 @@
 
     <!-- Right Side: Order Summary -->
     <div class="col-md-4">
-      <div class="card shadow-sm p-3">
+      <div class="card shadow-sm p-3 con-os">
         <h5 class="mb-3">Order Summary</h5>
         <ul class="list-group mb-3">
           <% let total = 0; %>
