@@ -114,7 +114,7 @@ router.get('/cart', (req, res) => {
   const user = req.session.user;
 
   if (user && user.id) {
-    const sql = `SELECT c.id, c.product_id, c.quantity, p.name, p.price AS original_price, p.image,
+    const sql = `SELECT c.id, c.product_id, c.quantity, p.name, p.price, p.price AS original_price, p.image,
              p.is_special_active, p.discount_percent,
              CASE 
                WHEN p.is_special_active = 1 AND p.discount_percent > 0 
@@ -129,7 +129,13 @@ router.get('/cart', (req, res) => {
         console.error('DB Cart Load Error:', err);
         return res.send('Error loading cart');
       }
-
+        // Ensure numeric consistency
+      results.forEach(item => {
+        item.price = Number(item.price) || 0;
+        item.quantity = parseInt(item.quantity, 10) || 1;
+        item.original_price = parseFloat(item.original_price) || 0;
+        item.discountedPrice = parseFloat(item.discountedPrice) || item.original_price;
+      });
   res.render('cart',{ cart: results || [], user });
     });
         
@@ -137,6 +143,10 @@ router.get('/cart', (req, res) => {
     const cart = req.session.cart || [];
 
      cart.forEach(item => {
+       item.price = Number(item.price) || 0;
+        item.discount_percent = parseFloat(item.discount_percent) || 0;
+        item.quantity = parseInt(item.quantity, 10) || 1;
+        item.original_price = item.price;
       if (item.is_special_active && item.discount_percent > 0) {
         item.discountedPrice = parseFloat(
           (item.price - (item.price * item.discount_percent / 100)).toFixed(2)

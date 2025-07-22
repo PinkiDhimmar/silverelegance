@@ -27,7 +27,16 @@
             </a>
               <div class="card-body">
                 <h5 class="card-title"><%= product.name %></h5>
-                <p class="fw-bold text-primary">$<%= product.price.toFixed(2) %></p>
+                
+      <% if (product.is_special_active && product.discount_percent > 0 && product.discountedPrice) { %>
+        <span class="badge bg-danger position-absolute top-0 end-0 m-2">SALE - <%= product.discount_percent %>% OFF</span>
+        <p class="fw-bold text-danger">
+          $<%= product.discountedPrice.toFixed(2) %>
+          <small class="text-muted text-decoration-line-through ms-1">$<%= product.price.toFixed(2) %></small>
+        </p>
+      <% } else { %>
+        <p class="fw-bold text-primary">$<%= product.price.toFixed(2) %></p>
+      <% } %>
                 
                 <% if (product.stock === 0) { %> 
                 <span class="badge bg-danger mb-2">Sold Out</span>

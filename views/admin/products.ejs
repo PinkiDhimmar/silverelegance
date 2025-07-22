@@ -40,6 +40,9 @@
               <tr>
                 <td><%= product.id %></td>
                 <td><img src="/uploads/<%= product.image %>" alt="<%= product.image %>" width="70"></td>
+                <% if (product.is_special_active && product.discount_percent > 0) { %>
+                  <span class="badge bg-danger position-absolute top-0 end-0 m-2">SALE - <%= product.discount_percent %>%</span>
+                <% } %>
                 <td><%= product.name %></td>
                 <td><%= product.description %></td>
                 <td><%= product.category_name %></td>

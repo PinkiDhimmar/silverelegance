@@ -89,8 +89,6 @@ router.get('/admin/dashboard-data', (req, res) => {
   }
 });
 
-
-
 // View Products
 router.get('/admin/products', (req, res) => {
   const sql = `SELECT p.id, p.name, p.description, p.price, p.stock, p.image, c.name AS category_name 
