@@ -1,4 +1,5 @@
 <head>
+    <title> My Order Details </title>
     <meta charset="UTF-8">
     <link href="/public/css/style.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -14,13 +15,19 @@
                     <main class="col-md-9 orderdetails">
                         <h3>My Order</h3>
                         <p>List of your recent orders will go here.</p>
-                        <h4 class="mt-5">My Orders</h4>
+                        
 
                         <% if (items.length === 0) { %>
-                            <div class="container shopping">
-                                <p>Nothing to see here.</p>
-                                <p>You don't have any previous orders</p>
-                                <a href="/" class="ss">START SHOPPING</a>
+                            <div class="container mt-5 container-shopping">
+                            <div class="row align-items-center">
+                            <div class="col-md-8 text-md-start text-center">
+                                <p class="ntsh mt-3">Nothing to see here.</p>
+                                <p class="text-muted">You don't have any previous orders</p>
+                            </div>
+                            <div class="col-md-4 text-md-end text-center mt-3 mt-md-0">
+                            <a href="/" class="ss">START SHOPPING</a>
+                            </div>
+                            </div>
                             </div>
                             <% } else { %>
                                 <table class="table table-bordered mt-2">
@@ -34,16 +41,38 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <% items.forEach(item=> { %>
-                                            <tr>
-                                                <td><%= item.image %></td>
-                                                <td><%= item.name %></td>
-                                                <td><%= item.quantity %></td>
-                                                <td>$<%= item.price %></td>
-                                                <td>$<%= (item.quantity * item.price).toFixed(2) %></td>
-                                            </tr>
-                                            <% }) %>
+                                    <% 
+                                    let total = 0;
+                                    items.forEach(item => {
+                                    const originalPrice = item.price;
+                                    const isSpecial = item.is_special_active;
+                                    const discount = item.discount_percent || 0;
+                                    const discountedPrice = isSpecial ? originalPrice * (1 - discount / 100) : originalPrice;
+                                    const subtotal = discountedPrice * item.quantity;
+                                    total += subtotal;
+                                    %>
+                                     <tr>
+                                        <td><img src="/public/images/<%= item.image %>" alt="<%= item.name %>" width="60"></td>
+                                        <td><%= item.name %></td>
+                                        <td><%= item.quantity %></td>
+                                         <td>
+                                            <% if (isSpecial) { %>
+                                            <span class="text-danger">$<%= discountedPrice.toFixed(2) %></span> 
+                                            <del class="text-muted">$<%= originalPrice.toFixed(2) %></del>
+                                            <% } else { %>
+                                            $<%= originalPrice.toFixed(2) %>
+                                            <% } %>
+                                        </td>
+                                        <td>$<%= subtotal.toFixed(2) %></td>
+                                    </tr>
+                            <% }) %>
                                     </tbody>
+                                    <tfoot>
+                                        <tr>
+                                        <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                                        <td><strong>$<%= total.toFixed(2) %></strong></td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                                 <% } %>
 

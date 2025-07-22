@@ -22,6 +22,7 @@
     <!-- Left Side: Cart Items -->
     <div class="col-md-8">
       <% cart.forEach(item => { %>
+        
         <div class="card mb-3 shadow-sm">
           <div class="row g-0 align-items-center">
             <div class="col-md-3">
@@ -31,9 +32,11 @@
               <div class="card-body con-cart">
                 <h5 class="card-title"><%= item.name %></h5>
                 <p class="card-text mb-1">
+                  
                   <% if (item.is_special_active && item.discount_percent > 0) { %>
                     <span class="text-muted text-decoration-line-through me-2">$<%= item.original_price.toFixed(2) %></span>
                     <span class="text-danger fw-bold">$<%= item.discountedPrice.toFixed(2) %></span>
+                    
                   <% } else { %>
                    <span class="fw-bold"> $<%= item.price.toFixed(2) %></span>
                   <% } %>

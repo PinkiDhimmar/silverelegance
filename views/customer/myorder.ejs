@@ -15,11 +15,16 @@
                         <h4 class="mt-3" style="font-weight: bold;">My Orders</h4>
 
                         <% if (orders.length===0) { %>
-                            <div class="container shopping">
-                                <p style="font-weight: bold; font-size: 16px;">Nothing to see here.</p>
-                                <p>You don't have any previous orders</p>
-                                <a href="/" class="ss">START SHOPPING</a>
-                                
+                            <div class="container mt-5 container-shopping">
+                            <div class="row align-items-center">
+                            <div class="col-md-8 text-md-start text-center">
+                                <p class="ntsh mt-3">Nothing to see here.</p>
+                                <p class="text-muted">You don't have any previous orders</p>
+                            </div>
+                            <div class="col-md-4 text-md-end text-center mt-3 mt-md-0">
+                            <a href="/" class="ss">START SHOPPING</a>
+                            </div>
+                            </div>
                             </div>
                             <% } else { %>
                                 <div class="table-responsive">

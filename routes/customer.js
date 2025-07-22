@@ -61,12 +61,9 @@ router.get('/customer/order-details/:id', ensureCustomer, (req, res) => {
     if (err || orderResult.length === 0) return res.send('Order not found or unauthorized.');
 
     const order = orderResult[0];
-    const sql = `
-      SELECT order_items.quantity, products.name, products.price, products.image 
-      FROM order_items 
-      JOIN products ON order_items.product_id = products.id 
-      WHERE order_items.order_id = ?
-    `;
+    const sql = `SELECT order_items.quantity, products.name, products.price, products.image, products.discount_percent, 
+                  products.is_special_active FROM order_items JOIN products ON order_items.product_id = products.id 
+                  WHERE order_items.order_id = ?`;
     conn.query(sql, [orderId], (err2, items) => {
       if (err2) return res.send('Error loading order items');
 

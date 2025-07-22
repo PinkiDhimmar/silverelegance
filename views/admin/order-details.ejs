@@ -51,17 +51,35 @@
         <h5>Items:</h5>
         <table class="table">
           <thead>
-            <tr><th>Product</th><th>Qty</th><th>Price</th></tr>
+            <tr><th>Product</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
           </thead>
           <tbody>
-            <% items.forEach(item => { %>
+            <% 
+              let total = 0;
+              items.forEach(item => {
+                const originalPrice = item.price;
+                const discount = item.discount_percent || 0;
+                const isSpecial = item.is_special_active;
+                const discountedPrice = isSpecial ? originalPrice * (1 - discount / 100) : originalPrice;
+                const subtotal = discountedPrice * item.quantity;
+                total += subtotal;
+            %>
               <tr>
                 <td><%= item.name %></td>
                 <td><%= item.quantity %></td>
-                <td>$<%= item.price %></td>
+                <td>
+                  <% if (isSpecial) { %>
+                    <span class="text-danger">$<%= discountedPrice.toFixed(2) %></span>
+                    <del class="text-muted">$<%= originalPrice.toFixed(2) %></del>
+                  <% } else { %>
+                    $<%= originalPrice.toFixed(2) %>
+                  <% } %>
+                </td>
+                <td>$<%= subtotal.toFixed(2) %></td>
               </tr>
             <% }) %>
           </tbody>
+         
         </table>
       </div>
     </div>

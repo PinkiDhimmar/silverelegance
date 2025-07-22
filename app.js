@@ -42,6 +42,8 @@ app.use(session({
 // Static assets
 app.use('/public', express.static('public'));
 app.use('/uploads', express.static('uploads'));
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
 
 //Make conn available in all routes
 app.use((req, res, next) => {

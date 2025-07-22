@@ -798,14 +798,16 @@
   background-color: #B32748;
   color: #fff;
 }
-.myorder .shopping{
-  padding: 10px;
-  margin-top: 20px;
-border:1px solid #f2f2f2;
-background-color: #f2f2f2;
-position: relative;
+.container-shopping{
+  border: 1px solid #f2f2f2;
+  background-color: #f2f2f2;
 }
-.ss{
+.container-shopping .ntsh{
+  font-weight: bold; 
+  font-size: 16px;
+}
+
+.container-shopping .ss{
   margin-top: 1 rem;
   padding: 0.5rem 1rem;
   line-height: 1.57143;

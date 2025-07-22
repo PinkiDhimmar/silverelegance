@@ -21,6 +21,75 @@ router.get('/admin/dashboard', (req, res) => {
   }
   res.render('admin/dashboard', { user: req.session.user });
 });
+//admin dashboard total of users, orders, products, revenue
+router.get('/admin/dashboard-data', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    // Your existing queries here, but use callback or synchronous style if you don't have promises
+    conn.query('SELECT COUNT(*) AS total_orders FROM orders', (err, orders) => {
+      if (err) {
+        console.error('DB Error:', err);
+        return res.status(500).json({ error: 'Server error' });
+      }
+
+      conn.query('SELECT COUNT(*) AS total_customers FROM users WHERE role = "customer"', (err, customers) => {
+        if (err) {
+          console.error('DB Error:', err);
+          return res.status(500).json({ error: 'Server error' });
+        }
+
+        conn.query('SELECT SUM(total_amount) AS total_revenue FROM orders', (err, revenue) => {
+          if (err) {
+            console.error('DB Error:', err);
+            return res.status(500).json({ error: 'Server error' });
+          }
+
+          conn.query('SELECT COUNT(*) AS total_products FROM products', (err, products) => {
+            if (err) {
+              console.error('DB Error:', err);
+              return res.status(500).json({ error: 'Server error' });
+            }
+
+            conn.query(`SELECT o.id, o.total_amount, o.status, o.created_at, u.name AS customer_name
+                        FROM orders o LEFT JOIN users u ON o.user_id = u.id
+                        ORDER BY o.created_at DESC
+                        LIMIT 5`, (err, recentOrders) => {
+              if (err) {
+                console.error('DB Error:', err);
+                return res.status(500).json({ error: 'Server error' });
+              }
+
+              // Prepare response data
+              const stats = {
+                total_orders: orders[0].total_orders,
+                total_customers: customers[0].total_customers,
+                total_revenue: revenue[0].total_revenue || 0,
+                total_products: products[0].total_products,
+              };
+
+              // Optionally build revenue chart data here if you want, or send empty for now
+              const chartData = {
+                labels: [], 
+                values: []
+              };
+
+              res.json({ stats, recentOrders, chartData });
+            });
+          });
+        });
+      });
+    });
+
+  } catch (error) {
+    console.error('Server Error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 
 // View Products
 router.get('/admin/products', (req, res) => {
@@ -189,12 +258,9 @@ router.get('/admin/order-details/:id', (req, res) => {
     if (err || orderResult.length === 0) return res.send('Order not found');
     const order = orderResult[0];
 
-    const sql = `
-      SELECT oi.quantity, p.name, p.price 
-      FROM order_items oi 
-      JOIN products p ON oi.product_id = p.id 
-      WHERE oi.order_id = ?
-    `;
+    const sql = `SELECT oi.quantity, p.name, p.price, p.discount_percent, p.is_special_active 
+                  FROM order_items oi JOIN products p ON oi.product_id = p.id 
+                  WHERE oi.order_id = ?`;
     conn.query(sql, [orderId], (err2, items) => {
       if (err2) return res.send('Could not load items');
       res.render('admin/order-details', {
