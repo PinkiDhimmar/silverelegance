@@ -135,7 +135,14 @@ app.get('/', (req, res) => {
     });
   });
 });
-
+//footer about us page
+app.get('/about', (req, res) => {
+  res.render('about'); // make sure views/about.ejs exists
+});
+//footer services page
+app.get('/services', (req, res) => {
+  res.render('services'); // make sure views/about.ejs exists
+});
 // Logout
 app.get('/logout', (req, res) => {
   req.session.destroy();
