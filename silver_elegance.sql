@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 23, 2025 at 12:36 AM
+-- Generation Time: Jul 25, 2025 at 01:37 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -80,6 +80,10 @@ CREATE TABLE `messages` (
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `message` text NOT NULL,
+  `replied_at` datetime NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `replied` tinyint(1) NOT NULL,
+  `reply_content` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -87,8 +91,9 @@ CREATE TABLE `messages` (
 -- Dumping data for table `messages`
 --
 
-INSERT INTO `messages` (`id`, `name`, `email`, `message`, `created_at`) VALUES
-(1, 'Anika', 'anika@gmail.com', 'I am looking for a diamond bracelate.', '2025-06-19 09:59:21');
+INSERT INTO `messages` (`id`, `name`, `email`, `message`, `replied_at`, `subject`, `replied`, `reply_content`, `created_at`) VALUES
+(1, 'Anika', 'anika@gmail.com', 'I am looking for a diamond bracelate.', '2025-06-19 21:59:21', '', 0, '', '2025-07-24 23:17:46'),
+(2, 'Pinki', 'pinkidhimmar@gmail.com', 'I need diamond ring for engagement.', '2025-07-25 11:30:06', 'Ring', 1, 'Hi Pinki, \r\nThank you for contacting us. I will send you some photos so you will get some ides.\r\nThank you.', '2025-07-24 23:17:46');
 
 -- --------------------------------------------------------
 
@@ -326,7 +331,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `orders`

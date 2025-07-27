@@ -14,6 +14,17 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+//nodemailer for reply message
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'silverjewellerywellington@gmail.com',
+    pass: 'vwix yhqs psen cfrp'
+  }
+});
+
 // Admin Dashboard
 router.get('/admin/dashboard', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'admin') {
@@ -338,13 +349,40 @@ router.get('/admin/messages', (req, res) => {
   });
 });
 
-router.post('/admin/messages/:id/reply', (req, res) => {
-  const { reply } = req.body;
-  conn.query('UPDATE messages SET reply = ? WHERE id = ?', [reply, req.params.id], err => {
-    if (err) return res.send('Reply failed');
-    res.redirect('/admin/messages');
+
+router.post('/admin/messages/reply/:id', (req, res) => {
+  const messageId = req.params.id;
+  const { reply_content } = req.body;
+
+  conn.query('SELECT * FROM messages WHERE id = ?', [messageId], (err, result) => {
+    if (err || result.length === 0) return res.send('Message not found');
+    const msg = result[0];
+
+    const mailOptions = {
+      from: 'silverjewellerywellington@gmail.com',
+      to: msg.email,
+      subject: `Re: ${msg.subject}`,
+      text: reply_content
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email send error:', error);
+        return res.send('Failed to send email.');
+      }
+
+      conn.query(
+        'UPDATE messages SET replied = 1, reply_content = ?, replied_at = NOW() WHERE id = ?',
+        [reply_content, messageId],
+        (err2) => {
+          if (err2) console.error('DB update error:', err2);
+          res.redirect('/admin/messages');
+        }
+      );
+    });
   });
 });
+
 
 // Helper function
 function slugify(text) {
@@ -397,7 +435,7 @@ router.get('/admin/special-edit/:id', (req, res) => {
   conn.query(sql, [req.params.id], (err, result) => {
     if (err) throw err;
     if (result.length === 0) return res.send("Not found");
-    res.render('admin/special-edit', { special: result[0] });
+    res.render('admin/special-edit', { special: result[0], user: req.session.user });
   });
 });
 

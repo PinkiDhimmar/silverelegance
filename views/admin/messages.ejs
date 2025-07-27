@@ -26,6 +26,7 @@
     <tr>
         <th>Name</th>
         <th>Email</th>
+        <th>Subject</th>
         <th>Message</th>
         <th>Reply</th>
     </tr>
@@ -35,40 +36,41 @@
         <tr>
             <td><%= msg.name %></td>
             <td><%= msg.email %></td>
+            <td><%= msg.subject %></td>
             <td><%= msg.message %></td>
             <td>
-                <% if (msg.reply) { %>
-                    <%= msg.reply %>
-                        <% } else { %>
-                            <!-- Reply button opens modal -->
-<button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#replyModal<%= msg.id %>">Reply</button>
-                            <% } %>
+                  <% if (msg.reply) { %>
+                  <div class="text-success"><%= msg.reply %></div>
+                <% } else { %>
+                  <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#replyModal<%= msg.id %>">Reply</button>
+                <% } %>
             </td>
         </tr>
 
         <!-- Reply Modal -->
 <div class="modal fade" id="replyModal<%= msg.id %>" tabindex="-1" aria-labelledby="replyModalLabel<%= msg.id %>" aria-hidden="true">
-    <div class="modal-dialog">
-        <form method="POST" action="/admin/messages/<%= msg.id %>/reply">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="replyModalLabel<%= msg.id %>">Reply to <%= msg.name %></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Message:</strong><%= msg.message %></p>
-                    <div class="form-floating">
-                    <textarea class="form-control" name="reply" id="replyText<%= msg.id %>" style="height: 100px" required></textarea>
-                    <label for="replyText<%= msg.id %>">Your reply</label>
+              <div class="modal-dialog">
+                <form method="POST" action="/admin/messages/reply/<%= msg.id %>">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="replyModalLabel<%= msg.id %>">Reply to <%= msg.name %></h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn">Send Reply</button>
-                    <button type="button" class="btn" data-bs-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-        </form>
-    </div>
+                    <div class="modal-body">
+                      <p><strong>Subject:</strong> <%= msg.subject %></p>
+                      <p><strong>Message:</strong> <%= msg.message %></p>
+                      <div class="form-floating">
+                        <textarea class="form-control" name="reply_content" id="replyText<%= msg.id %>" style="height: 100px;" required></textarea>
+                        <label for="replyText<%= msg.id %>">Your reply</label>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="submit" class="btn ">Send Reply</button>
+                      <button type="button" class="btn " data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
 </div>
         <% }) %>
 </tbody>

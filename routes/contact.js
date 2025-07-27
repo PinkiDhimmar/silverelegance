@@ -9,20 +9,20 @@ router.get('/contact', (req, res) => {
 
 // Handle contact form submission
 router.post('/contact', (req, res) => {
-  const { name, email, message } = req.body;
+  const { name, email,subject, message } = req.body;
 
-  if (!name || !email || !message) {
+  if (!name || !email ||!subject || !message) {
     return res.redirect('/contact?msg=' + encodeURIComponent('Please fill in all fields.'));
   }
 
-  const sql = 'INSERT INTO messages (name, email, message) VALUES (?, ?, ?)';
-  conn.query(sql, [name, email, message], (err) => {
+  const sql = 'INSERT INTO messages (name, email,subject, message) VALUES (?, ?, ?, ?)';
+  conn.query(sql, [name, email,subject, message], (err) => {
     if (err) {
       console.error('Contact form insert error:', err);
       return res.redirect('/contact?msg=' + encodeURIComponent('Error sending message.'));
     }
 
-    res.redirect('/contact?msg=' + encodeURIComponent('Message sent successfully!'));
+    res.redirect('/contact?msg=' + encodeURIComponent('Thank you for contacting us. We will get back to you soon.'));
   });
 });
 
