@@ -34,17 +34,29 @@
     display: none;
   }
 
-  .search-form {
-    display: none;
-    transition: width 0.3s ease;
-    width: 0;
-    overflow: hidden;
-  }
+/* Hide checkbox */
+#searchToggle {
+  display: none;
+}
 
-  .search-toggle:checked + label + form.search-form {
-    display: inline-block;
-    width: 200px;
-  }
+/* Default hidden search form */
+.search-form-float {
+  display: none;
+  top: 60px;
+  right: 0;
+  width: 250px;
+  background-color: white;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 0.5rem;
+  z-index: 9999;
+}
+
+/* Show form when checkbox is checked */
+#searchToggle:checked ~ .search-form-float {
+  display: block;
+}
+
 
   .search-icon-btn {
     background: none;
@@ -58,6 +70,7 @@
     color: #B32748;
     border: 1px solid #B32748;
     font-weight: bold;
+    text-decoration: none;
   }
   .btn-view:hover {
     background-color: #B32748;
@@ -359,6 +372,7 @@
   color: white;
   padding: 40px 0;
   text-align: center;
+  margin-top: 80px;
 }
 .pro-card.sold {
   opacity: 0.7;
@@ -785,10 +799,11 @@
 }
 /*customer-dashboard my order details*/
 .myorder{
-   margin-top: 70px;
-      margin-left: 300px;
-      padding: 2rem;
-      height: 400px;
+  margin-top: 70px;
+  margin-left: 300px;
+  padding: 2rem;
+  height: 400px;
+    
 }
 .myorder .view{
   color: #B32748;
@@ -856,6 +871,7 @@
   color: white;
   padding: 40px 0;
   text-align: center;
+  margin-top: 100px;
 }
 .contact-card {
   border-radius: 12px;
@@ -912,7 +928,8 @@ img.payment-logo {
   padding-top: 110px; /* space below navbar */
   justify-content: center;
 }
-.reset{
+/*reset-password*/
+.btn-reset{
   background-color: #fff;
   color: #B32748;
   font-weight: bold;
@@ -921,7 +938,7 @@ img.payment-logo {
   border: 1px solid #B32748;
   border-radius: 6px;
 }
-.reset:hover {
+.btn-reset:hover {
   background-color: #B32748;
   color: #fff;
  
@@ -962,4 +979,16 @@ img.payment-logo {
 }
 .wishlist-item .trash {
   color: #B32748;
+}
+/* order confirmation*/
+.btn-cshop{
+  color: #B32748;
+  border: #B32748 1px solid;
+  font-weight: bold;
+  background-color: #fff;
+}
+.btn-cshop:hover{
+  color: #fff;
+  background-color: #B32748;
+  font-weight: bold;
 }

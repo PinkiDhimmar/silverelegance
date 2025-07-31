@@ -13,6 +13,9 @@
         <%- include('partials/navbar1.ejs') %>
 		<div class="register-container">
             <div class="register-box">
+                <% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
 			<form action="/register" method="post">
                 <h1>Register</h1>
                 <p>Complete the form below to Register</p><br>

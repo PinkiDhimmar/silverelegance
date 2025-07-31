@@ -9,7 +9,7 @@ const nodemailer = require('nodemailer');
 
 // Register Page
 router.get('/register', (req, res) => {
-  res.render('register', { title: 'Register' });
+  res.render('register', { title: 'Register', error: null });
 });
 
 // Register (POST)
@@ -17,10 +17,24 @@ router.post('/register', async (req, res) => {
 let { name, email, password, address, city, postal_code, phone, DOB } = req.body;
 
   if (!email || !password || !name || !address || !city || !postal_code || !phone || !DOB) {
-    return res.send('All fields required');
+    return res.render('register', { error: 'All fields are required' });
   }
   email = email.trim().toLowerCase();
   password = password.trim();
+  // Check if email already exists
+  const checkEmailSql = 'SELECT id FROM users WHERE email = ?';
+  conn.query(checkEmailSql, [email], async (err, results) => {
+    if (err) {
+      console.error('DB error during email check:', err);
+      return res.render('register', { error: 'Internal server error' });
+    }
+
+    if (results.length > 0) {
+      // Email already exists
+    return res.render('register', { error: 'Email is already registered' });
+    }
+
+    // If not exists, proceed to register
   try {
     const hashedPassword = await bcrypt.hash(password, 12);
     const sql = `INSERT INTO users 
@@ -30,16 +44,16 @@ let { name, email, password, address, city, postal_code, phone, DOB } = req.body
     conn.query(sql, [name, email, hashedPassword, DOB, address, city, postal_code, phone], (err) => {
       if (err) {
         console.error('Register error:', err);
-        return res.send('User already exists or DB error');
+        return res.render('register', { error: 'User already exists or DB error' });
       }
       res.redirect('/login');
     });
   } catch (error) {
     console.error('Hashing error:', error);
-    res.send('Internal server error');
+    res.render('register', { error: 'Internal server error' });
   }
 });
-
+});
 
 // Login Page
 router.get('/login', (req, res) => {
