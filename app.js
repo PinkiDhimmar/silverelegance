@@ -56,6 +56,11 @@ app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   next();
 });
+//Prevent Browser Caching of Protected Pages
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 
 // pass cart to all views via middleware------navbar count 
 app.use((req, res, next) => {
@@ -145,8 +150,13 @@ app.get('/services', (req, res) => {
 });
 // Logout
 app.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect('/');
+  req.session.destroy(err => {
+    if (err) {
+      console.error(err);
+    }
+    res.clearCookie('connect.sid'); // if you're using default session cookie
+    res.redirect('/');
+  });
 });
 
 // Start server

@@ -333,8 +333,11 @@
       }
 
       if (paymentIntent.status === 'succeeded') {
-        document.getElementById('stripePaymentIntentId').value = paymentIntent.id;
+         document.getElementById('stripePaymentIntentId').value = paymentIntent.id;
         form.submit();
+      } else {
+        console.warn('Unexpected payment status:', paymentIntent.status);
+        alert('Payment did not complete. Please try again.');
       }
 
     } catch (err) {

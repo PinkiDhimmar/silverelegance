@@ -957,6 +957,9 @@ img.payment-logo {
   justify-content: center;
 }
 /* wishlist */
+.container-wishlist{
+  margin-top: 120px;
+}
 .wishlist-item .view{
   color: #B32748;
   border: 1px solid #B32748;

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 25, 2025 at 01:37 AM
+-- Generation Time: Jul 31, 2025 at 08:22 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -41,8 +41,7 @@ CREATE TABLE `cart` (
 INSERT INTO `cart` (`id`, `user_id`, `product_id`, `quantity`) VALUES
 (9, 18, 2, 1),
 (20, 19, 2, 1),
-(23, 20, 10, 1),
-(26, 20, 2, 1);
+(28, 20, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -137,7 +136,8 @@ INSERT INTO `orders` (`id`, `user_id`, `total_amount`, `status`, `created_at`, `
 (10, 20, 108.00, '', '2025-07-20 10:23:41', '', '', '', '', 'stripe', '2025-07-20 10:23:41', '', 'Pinki Dhimmar', 'pinkidhimmar@gmail.com', 'pi_3RmuP9DnqaJtUKSk0GMl5QDh', '{\"id\":\"pi_3RmuP9DnqaJtUKSk0GMl5QDh\",\"object\":\"payment_intent\",\"amount\":10800,\"amount_capturable\":0,\"amount_details\":{\"tip\":{}},\"amount_received\":10800,\"application\":null,\"application_fee_amount\":null,\"automatic_payment_methods\":{\"allow_redirects\":\"always\",\"enabled\":true},\"canceled_at\":null,\"cancellation_reason\":null,\"capture_method\":\"automatic_async\",\"client_secret\":\"pi_3RmuP9DnqaJtUKSk0GMl5QDh_secret_stx5qy5X39sePj7y1uz4rrHmu\",\"confirmation_method\":\"automatic\",\"created\":1753007019,\"currency\":\"nzd\",\"customer\":null,\"description\":null,\"last_payment_error\":null,\"latest_charge\":\"ch_3RmuP9DnqaJtUKSk0d8Xdpt2\",\"livemode\":false,\"metadata\":{},\"next_action\":null,\"on_behalf_of\":null,\"payment_method\":\"pm_1RmuP9DnqaJtUKSklWALtt9W\",\"payment_method_configuration_details\":{\"id\":\"pmc_1Rkws0DnqaJtUKSkf1jj1yid\",\"parent\":null},\"payment_method_options\":{\"card\":{\"installments\":null,\"mandate_options\":null,\"network\":null,\"request_three_d_secure\":\"automatic\"},\"klarna\":{\"preferred_locale\":null},\"link\":{\"persistent_token\":null}},\"payment_method_types\":[\"card\",\"klarna\",\"link\"],\"processing\":null,\"receipt_email\":null,\"review\":null,\"setup_future_usage\":null,\"shipping\":null,\"source\":null,\"statement_descriptor\":null,\"statement_descriptor_suffix\":null,\"status\":\"succeeded\",\"transfer_data\":null,\"transfer_group\":null}', 'pickup', 0.00, '', ''),
 (12, 20, 35.00, '', '2025-07-20 10:36:54', '', '', '', '', 'stripe', '2025-07-20 10:36:54', '', 'Pinki Dhimmar', 'pinkidhimmar@gmail.com', 'pi_3RmubwDnqaJtUKSk1eem473J', '{\"id\":\"pi_3RmubwDnqaJtUKSk1eem473J\",\"object\":\"payment_intent\",\"amount\":3500,\"amount_capturable\":0,\"amount_details\":{\"tip\":{}},\"amount_received\":3500,\"application\":null,\"application_fee_amount\":null,\"automatic_payment_methods\":{\"allow_redirects\":\"always\",\"enabled\":true},\"canceled_at\":null,\"cancellation_reason\":null,\"capture_method\":\"automatic_async\",\"client_secret\":\"pi_3RmubwDnqaJtUKSk1eem473J_secret_AQ7S0VRN72HNCRvIjGS6Rf4Dm\",\"confirmation_method\":\"automatic\",\"created\":1753007812,\"currency\":\"nzd\",\"customer\":null,\"description\":null,\"last_payment_error\":null,\"latest_charge\":\"ch_3RmubwDnqaJtUKSk1XxPwThU\",\"livemode\":false,\"metadata\":{},\"next_action\":null,\"on_behalf_of\":null,\"payment_method\":\"pm_1RmubwDnqaJtUKSkfSYzeyJL\",\"payment_method_configuration_details\":{\"id\":\"pmc_1Rkws0DnqaJtUKSkf1jj1yid\",\"parent\":null},\"payment_method_options\":{\"card\":{\"installments\":null,\"mandate_options\":null,\"network\":null,\"request_three_d_secure\":\"automatic\"},\"klarna\":{\"preferred_locale\":null},\"link\":{\"persistent_token\":null}},\"payment_method_types\":[\"card\",\"klarna\",\"link\"],\"processing\":null,\"receipt_email\":null,\"review\":null,\"setup_future_usage\":null,\"shipping\":null,\"source\":null,\"statement_descriptor\":null,\"statement_descriptor_suffix\":null,\"status\":\"succeeded\",\"transfer_data\":null,\"transfer_group\":null}', 'pickup', 0.00, '', ''),
 (13, NULL, 35.00, '', '2025-07-20 10:48:09', '', '', '', '', 'stripe', '2025-07-20 10:48:09', '', 'abc', 'abc@gmail.com', 'pi_3RmumpDnqaJtUKSk0k6UX9O7', '{\"id\":\"pi_3RmumpDnqaJtUKSk0k6UX9O7\",\"object\":\"payment_intent\",\"amount\":3500,\"amount_capturable\":0,\"amount_details\":{\"tip\":{}},\"amount_received\":3500,\"application\":null,\"application_fee_amount\":null,\"automatic_payment_methods\":{\"allow_redirects\":\"always\",\"enabled\":true},\"canceled_at\":null,\"cancellation_reason\":null,\"capture_method\":\"automatic_async\",\"client_secret\":\"pi_3RmumpDnqaJtUKSk0k6UX9O7_secret_9CTwygsxRNO4yaW3fk1sXAcuh\",\"confirmation_method\":\"automatic\",\"created\":1753008487,\"currency\":\"nzd\",\"customer\":null,\"description\":null,\"last_payment_error\":null,\"latest_charge\":\"ch_3RmumpDnqaJtUKSk0dDQ4uWk\",\"livemode\":false,\"metadata\":{},\"next_action\":null,\"on_behalf_of\":null,\"payment_method\":\"pm_1RmumpDnqaJtUKSkv2Ahu7YY\",\"payment_method_configuration_details\":{\"id\":\"pmc_1Rkws0DnqaJtUKSkf1jj1yid\",\"parent\":null},\"payment_method_options\":{\"card\":{\"installments\":null,\"mandate_options\":null,\"network\":null,\"request_three_d_secure\":\"automatic\"},\"klarna\":{\"preferred_locale\":null},\"link\":{\"persistent_token\":null}},\"payment_method_types\":[\"card\",\"klarna\",\"link\"],\"processing\":null,\"receipt_email\":null,\"review\":null,\"setup_future_usage\":null,\"shipping\":null,\"source\":null,\"statement_descriptor\":null,\"statement_descriptor_suffix\":null,\"status\":\"succeeded\",\"transfer_data\":null,\"transfer_group\":null}', 'pickup', 0.00, '', ''),
-(14, 20, 54.00, '', '2025-07-21 07:51:44', '', '', '', '', 'stripe', '2025-07-21 07:51:44', '', 'Pinki Dhimmar', 'pinkidhimmar@gmail.com', 'pi_3RnEVeDnqaJtUKSk2vtPsrpn', '{\"id\":\"pi_3RnEVeDnqaJtUKSk2vtPsrpn\",\"object\":\"payment_intent\",\"amount\":5400,\"amount_capturable\":0,\"amount_details\":{\"tip\":{}},\"amount_received\":5400,\"application\":null,\"application_fee_amount\":null,\"automatic_payment_methods\":{\"allow_redirects\":\"always\",\"enabled\":true},\"canceled_at\":null,\"cancellation_reason\":null,\"capture_method\":\"automatic_async\",\"client_secret\":\"pi_3RnEVeDnqaJtUKSk2vtPsrpn_secret_7zsiKSaW4GZEQkKGmrJTXLcjh\",\"confirmation_method\":\"automatic\",\"created\":1753084302,\"currency\":\"nzd\",\"customer\":null,\"description\":null,\"last_payment_error\":null,\"latest_charge\":\"ch_3RnEVeDnqaJtUKSk2w0MF4Dy\",\"livemode\":false,\"metadata\":{},\"next_action\":null,\"on_behalf_of\":null,\"payment_method\":\"pm_1RnEVeDnqaJtUKSk1F7uwJet\",\"payment_method_configuration_details\":{\"id\":\"pmc_1Rkws0DnqaJtUKSkf1jj1yid\",\"parent\":null},\"payment_method_options\":{\"card\":{\"installments\":null,\"mandate_options\":null,\"network\":null,\"request_three_d_secure\":\"automatic\"},\"klarna\":{\"preferred_locale\":null},\"link\":{\"persistent_token\":null}},\"payment_method_types\":[\"card\",\"klarna\",\"link\"],\"processing\":null,\"receipt_email\":null,\"review\":null,\"setup_future_usage\":null,\"shipping\":null,\"source\":null,\"statement_descriptor\":null,\"statement_descriptor_suffix\":null,\"status\":\"succeeded\",\"transfer_data\":null,\"transfer_group\":null}', 'pickup', 0.00, '', '');
+(14, 20, 54.00, '', '2025-07-21 07:51:44', '', '', '', '', 'stripe', '2025-07-21 07:51:44', '', 'Pinki Dhimmar', 'pinkidhimmar@gmail.com', 'pi_3RnEVeDnqaJtUKSk2vtPsrpn', '{\"id\":\"pi_3RnEVeDnqaJtUKSk2vtPsrpn\",\"object\":\"payment_intent\",\"amount\":5400,\"amount_capturable\":0,\"amount_details\":{\"tip\":{}},\"amount_received\":5400,\"application\":null,\"application_fee_amount\":null,\"automatic_payment_methods\":{\"allow_redirects\":\"always\",\"enabled\":true},\"canceled_at\":null,\"cancellation_reason\":null,\"capture_method\":\"automatic_async\",\"client_secret\":\"pi_3RnEVeDnqaJtUKSk2vtPsrpn_secret_7zsiKSaW4GZEQkKGmrJTXLcjh\",\"confirmation_method\":\"automatic\",\"created\":1753084302,\"currency\":\"nzd\",\"customer\":null,\"description\":null,\"last_payment_error\":null,\"latest_charge\":\"ch_3RnEVeDnqaJtUKSk2w0MF4Dy\",\"livemode\":false,\"metadata\":{},\"next_action\":null,\"on_behalf_of\":null,\"payment_method\":\"pm_1RnEVeDnqaJtUKSk1F7uwJet\",\"payment_method_configuration_details\":{\"id\":\"pmc_1Rkws0DnqaJtUKSkf1jj1yid\",\"parent\":null},\"payment_method_options\":{\"card\":{\"installments\":null,\"mandate_options\":null,\"network\":null,\"request_three_d_secure\":\"automatic\"},\"klarna\":{\"preferred_locale\":null},\"link\":{\"persistent_token\":null}},\"payment_method_types\":[\"card\",\"klarna\",\"link\"],\"processing\":null,\"receipt_email\":null,\"review\":null,\"setup_future_usage\":null,\"shipping\":null,\"source\":null,\"statement_descriptor\":null,\"statement_descriptor_suffix\":null,\"status\":\"succeeded\",\"transfer_data\":null,\"transfer_group\":null}', 'pickup', 0.00, '', ''),
+(15, 20, 54.00, '', '2025-07-27 08:53:30', '', '', '', '', 'stripe', '2025-07-27 08:53:30', '', 'Pinki Dhimmar', 'pinkidhimmar@gmail.com', 'pi_3RpQKiDnqaJtUKSk0zhGXcwn', '{\"id\":\"pi_3RpQKiDnqaJtUKSk0zhGXcwn\",\"object\":\"payment_intent\",\"amount\":5400,\"amount_capturable\":0,\"amount_details\":{\"tip\":{}},\"amount_received\":5400,\"application\":null,\"application_fee_amount\":null,\"automatic_payment_methods\":{\"allow_redirects\":\"always\",\"enabled\":true},\"canceled_at\":null,\"cancellation_reason\":null,\"capture_method\":\"automatic_async\",\"client_secret\":\"pi_3RpQKiDnqaJtUKSk0zhGXcwn_secret_gbmW30mdBJpwdmt492OIu9GJg\",\"confirmation_method\":\"automatic\",\"created\":1753606408,\"currency\":\"nzd\",\"customer\":null,\"description\":null,\"last_payment_error\":null,\"latest_charge\":\"ch_3RpQKiDnqaJtUKSk0ObDdhkW\",\"livemode\":false,\"metadata\":{},\"next_action\":null,\"on_behalf_of\":null,\"payment_method\":\"pm_1RpQKjDnqaJtUKSkMM5EbgXO\",\"payment_method_configuration_details\":{\"id\":\"pmc_1Rkws0DnqaJtUKSkf1jj1yid\",\"parent\":null},\"payment_method_options\":{\"card\":{\"installments\":null,\"mandate_options\":null,\"network\":null,\"request_three_d_secure\":\"automatic\"},\"klarna\":{\"preferred_locale\":null},\"link\":{\"persistent_token\":null}},\"payment_method_types\":[\"card\",\"klarna\",\"link\"],\"processing\":null,\"receipt_email\":null,\"review\":null,\"setup_future_usage\":null,\"shipping\":null,\"source\":null,\"statement_descriptor\":null,\"statement_descriptor_suffix\":null,\"status\":\"succeeded\",\"transfer_data\":null,\"transfer_group\":null}', 'pickup', 0.00, '', '');
 
 -- --------------------------------------------------------
 
@@ -166,7 +166,8 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `price`) 
 (6, 5, 8, 1, 55.00),
 (13, 12, 4, 1, 35.00),
 (14, 13, 4, 1, 35.00),
-(15, 14, 2, 1, 60.00);
+(15, 14, 2, 1, 60.00),
+(16, 15, 2, 1, 60.00);
 
 -- --------------------------------------------------------
 
@@ -194,7 +195,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `stock`, `image`, `category_id`, `created_at`, `is_special_active`, `special_event_name`, `special_ends_on`, `discount_percent`) VALUES
-(2, 'Diamond Ring', 'This ring offers a combination of elegance and affordability compared to gold or platinum rings. They are popular for various occasions, including engagements, weddings, anniversaries, and fashion accessories.', 60.00, 9, 'Diamond Ring.jpg', 1, '2025-06-19 03:16:41', 1, 'Navratri Specials', '2025-07-26 11:59:00', 10),
+(2, 'Diamond Ring', 'This ring offers a combination of elegance and affordability compared to gold or platinum rings. They are popular for various occasions, including engagements, weddings, anniversaries, and fashion accessories.', 60.00, 8, 'Diamond Ring.jpg', 1, '2025-06-19 03:16:41', 1, 'Navratri Specials', '2025-08-03 23:59:00', 10),
 (3, 'Bangle Style Bracelet', 'These bracelets are popular for their elegance and simplicity, making them perfect for everyday wear or adding a subtle touch of luxury to formal outfits.', 120.00, 10, 'Bracelet.jpg', 3, '2025-06-20 08:42:42', 0, '', '0000-00-00 00:00:00', 0),
 (4, 'Sparkling Pink Halo Ring', 'This stunning vintage-inspired ring is one you\'ll treasure forever. Crafted in sterling silver, this sophisticated S925 Timeless ring is embellished with a halo of sparkling cubic zirconia stones and features a large rectangular radiant-cut stone as a stand-out centrepiece. ', 35.00, 9, 'pink ring.jpg', 1, '2025-06-20 22:25:47', 0, '', '0000-00-00 00:00:00', 0),
 (5, 'Snake chain slider Anklets with flower round clasp', 'This stunning snake chain bracelet is a sophisticated spin on the classic friendship bracelet. Hand-finished in polished sterling silver, it features one movable and one fixed end cap — both set with shimmering stones. An innovative sliding clasp makes it easy to adjust it to your size. The perfect present for friends and loved ones, this bracelet can be styled by lifting the movable end cap and it has beautiful charms.', 75.00, 1, 'ankelet.jpg', 5, '2025-06-21 08:21:41', 0, '', '0000-00-00 00:00:00', 0),
@@ -250,6 +251,14 @@ CREATE TABLE `wishlist` (
   `product_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `wishlist`
+--
+
+INSERT INTO `wishlist` (`created_at`, `id`, `product_id`, `user_id`) VALUES
+('2025-07-27 20:51:19', 9, 10, 20),
+('2025-07-27 20:52:06', 10, 4, 20);
 
 --
 -- Indexes for dumped tables
@@ -319,7 +328,7 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -337,13 +346,13 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -361,7 +370,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
