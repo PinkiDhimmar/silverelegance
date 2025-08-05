@@ -24,7 +24,13 @@
       </div>
       <div class="col-md-6">
         <h2><%= product.name %></h2>
-        <% if (product.is_special_active && product.discount_percent > 0) { %>
+        <% 
+          const now = new Date();
+          const specialEnd = new Date(product.special_end_date);
+          const isActiveSpecial = product.is_special_active && product.discount_percent > 0 && specialEnd > now;
+        %>
+
+        <% if (isActiveSpecial) { %>
           <p>
             <span class="text-muted text-decoration-line-through me-2">
               $<%= product.price.toFixed(2) %>
@@ -32,16 +38,19 @@
             <span class="text-danger fw-bold">
               $<%= product.display_price.toFixed(2) %>
             </span>
-          <span class="badge bg-danger">SALE</span>
+            <span class="badge bg-danger">SALE</span>
+          </p>
+        <% } else if (!isActiveSpecial && product.discount_percent > 0 && specialEnd < now) { %>
+          <p>
+            <span class="fw-bold text-primary">$<%= product.price.toFixed(2) %></span>
+            <span class="badge bg-secondary">Sale Ended</span>
           </p>
         <% } else { %>
           <p><strong>$<%= product.price.toFixed(2) %></strong></p>
         <% } %>
-        <p class="text-muted">Category: <%= product.category_name %></p>
-       
-        <p><%= product.description %></p>
 
-        
+        <p class="text-muted">Category: <%= product.category_name %></p>
+        <p><%= product.description %></p>
 
         <form action="/cart/add" method="POST" class="w-50">
           <input type="hidden" name="productId" value="<%= product.id %>">

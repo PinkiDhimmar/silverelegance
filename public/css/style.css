@@ -389,7 +389,9 @@
 .card-body .add{
   background-color: #B32748;
   color: #fff;
+  font-weight: bold;
 }
+
 .card-body .view{
   color: #B32748;
   border:1px solid #B32748;

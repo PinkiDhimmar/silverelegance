@@ -21,7 +21,13 @@
   <div class="row">
     <!-- Left Side: Cart Items -->
     <div class="col-md-8">
-      <% cart.forEach(item => { %>
+      <% cart.forEach(item => {
+         const now = new Date();
+  const specialEnd = item.special_end_date ? new Date(item.special_end_date) : null;
+  const isSpecialExpired = specialEnd ? specialEnd <= now : false;
+  const showOriginalPrice = !item.is_special_active || item.discount_percent <= 0 || isSpecialExpired;
+  const discountedPrice = item.price * (1 - (item.discount_percent || 0) / 100);
+%>
         <div class="card mb-3 shadow-sm">
           <div class="row g-0 align-items-center">
             <div class="col-md-3">
@@ -31,14 +37,13 @@
               <div class="card-body con-cart">
                 <h5 class="card-title"><%= item.name %></h5>
                 <p class="card-text mb-1">
-                  
-                  <% if (item.is_special_active && item.discount_percent > 0) { %>
-                    <span class="text-muted text-decoration-line-through me-2">$<%= item.original_price.toFixed(2) %></span>
-                    <span class="text-danger fw-bold">$<%= item.discountedPrice.toFixed(2) %></span>
-                    
-                  <% } else { %>
-                   <span class="fw-bold"> $<%= item.price.toFixed(2) %></span>
-                  <% } %>
+                <% if (!showOriginalPrice) { %>
+              <span class="text-muted text-decoration-line-through me-2">$<%= item.price.toFixed(2) %></span>
+              <span class="text-danger fw-bold">$<%= discountedPrice.toFixed(2) %></span>
+              <span class="badge bg-danger ms-2">SALE</span>
+            <% } else { %>
+              <span class="fw-bold">$<%= item.price.toFixed(2) %></span>
+            <% } %>
                 </p>
 
                 <p class="text-muted small mb-2">Code: <%= item.code || 'N/A' %></p>
@@ -72,9 +77,13 @@
         <ul class="list-group mb-3">
           <% let total = 0; %>
           <% cart.forEach(item => {
-               let unitPrice = (item.is_special_active && item.discount_percent > 0) ? item.discountedPrice : item.price;
-                   let subtotal = unitPrice * item.quantity;
-                   total += subtotal;
+             const now = new Date();
+              const specialEnd = new Date(item.special_end_date);
+              const isSpecialExpired = specialEnd <= now;
+              const showOriginalPrice = !item.is_special_active || item.discount_percent <= 0 || isSpecialExpired;
+              let unitPrice = showOriginalPrice ? item.price : item.discountedPrice;
+              let subtotal = unitPrice * item.quantity;
+              total += subtotal;
           %>
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <%= item.name %> × <%= item.quantity %>

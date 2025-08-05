@@ -112,6 +112,7 @@ router.post('/cart/remove', (req, res) => {
 // View cart (only for guest — DB users go to /checkout)
 router.get('/cart', (req, res) => {
   const user = req.session.user;
+  
 
   if (user && user.id) {
     const sql = `SELECT c.id, c.product_id, c.quantity, p.name, p.price, p.price AS original_price, p.image,

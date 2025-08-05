@@ -19,7 +19,11 @@
       <% if (products.length === 0) { %>
         <p class="text-center">No products found in this category.</p>
       <% } else { %>    
-        <% products.forEach(product => { %>
+        <% products.forEach(product => { 
+          const now = new Date();
+        const specialEnd = new Date(product.special_end_date);
+        const isActiveSpecial = product.is_special_active && product.discount_percent > 0 && specialEnd > now;
+      %>
           <div class="col-md-4 mb-4 mt-3">
             <div class="card pro-card h-100 <%= product.stock === 0 ? 'sold' : '' %>">
             <a href="/product/<%= product.id %>"> 
@@ -28,16 +32,18 @@
               <div class="card-body">
                 <h5 class="card-title"><%= product.name %></h5>
                 
-      <% if (product.is_special_active && product.discount_percent > 0 && product.discountedPrice) { %>
-        <span class="badge bg-danger position-absolute top-0 end-0 m-2">SALE - <%= product.discount_percent %>% OFF</span>
-        <p class="fw-bold text-danger">
-          $<%= product.discountedPrice.toFixed(2) %>
-          <small class="text-muted text-decoration-line-through ms-1">$<%= product.price.toFixed(2) %></small>
-        </p>
-      <% } else { %>
-        <p class="fw-bold text-primary">$<%= product.price.toFixed(2) %></p>
-      <% } %>
-                
+      <% if (isActiveSpecial) { %>
+                <span class="badge bg-danger position-absolute top-0 end-0 m-2">SALE - <%= product.discount_percent %>% OFF</span>
+                <p class="fw-bold text-danger">
+                  $<%= product.discountedPrice.toFixed(2) %>
+                  <small class="text-muted text-decoration-line-through ms-1">$<%= product.price.toFixed(2) %></small>
+                </p>
+              <% } else if (!isActiveSpecial && product.discount_percent > 0 && specialEnd < now) { %>
+                <span class="badge bg-secondary position-absolute top-0 end-0 m-2">Sale Ended</span>
+                <p class="fw-bold text-primary">$<%= product.price.toFixed(2) %></p>
+              <% } else { %>
+                <p class="fw-bold text-primary">$<%= product.price.toFixed(2) %></p>
+              <% } %>                
                 <% if (product.stock === 0) { %> 
                 <span class="badge bg-danger mb-2">Sold Out</span>
               <% } %>
@@ -46,6 +52,12 @@
                 <input type="hidden" name="productId" value="<%= product.id %>">
                 <input type="hidden" name="name" value="<%= product.name %>">
                 <input type="hidden" name="price" value="<%= product.price %>">
+                <input type="hidden" name="discountedPrice" value="<%= product.discounted_price || '' %>">
+                <input type="hidden" name="quantity" value="1">
+                <input type="hidden" name="image" value="<%= product.image %>">
+                <input type="hidden" name="code" value="<%= product.code %>">
+                <input type="hidden" name="is_special_active" value="<%= product.is_special_active %>">
+                <input type="hidden" name="discount_percent" value="<%= product.discount_percent %>">
                 <a href="/product/<%= product.id %>" class="btn view">View Details</a>
 
                 <% if (product.stock > 0) { %>
