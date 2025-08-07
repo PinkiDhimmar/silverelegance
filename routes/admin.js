@@ -159,7 +159,7 @@ router.post('/admin/products/edit/:id', upload.single('image'), (req, res) => {
     data = [name, description, category_id, price, stock, image, productId];
   } else {
     sql = `UPDATE products SET name = ?, description = ?, category_id = ?, price = ?, stock = ? WHERE id = ?`;
-    data = [name, description, category_id, price, productId];
+    data = [name, description, category_id, price, stock, productId];
   }
 
   conn.query(sql, data, err => {
@@ -237,9 +237,49 @@ router.post('/admin/categories/edit/:id', (req, res) => {
 
 // Delete Category
 router.get('/admin/categories/delete/:id', (req, res) => {
-  conn.query('DELETE FROM categories WHERE id = ?', [req.params.id], err => {
-    if (err) throw err;
-    res.redirect('/admin/categories');
+   const categoryId = req.params.id;
+
+  // Start a transaction to delete products first, then category
+  conn.beginTransaction(err => {
+    if (err) {
+      req.flash('error', 'Failed to start database transaction.');
+      return res.redirect('/admin/categories');
+    }
+
+    // Delete products in this category
+    conn.query('DELETE FROM products WHERE category_id = ?', [categoryId], (err, results) => {
+      if (err) {
+        return conn.rollback(() => {
+          console.error('Error deleting products:', err);
+          req.flash('error', 'Failed to delete related products.');
+          res.redirect('/admin/categories');
+        });
+      }
+
+      // Then delete the category itself
+      conn.query('DELETE FROM categories WHERE id = ?', [categoryId], (err, results) => {
+        if (err) {
+          return conn.rollback(() => {
+            console.error('Error deleting category:', err);
+            req.flash('error', 'Failed to delete category.');
+            res.redirect('/admin/categories');
+          });
+        }
+
+        conn.commit(err => {
+          if (err) {
+            return conn.rollback(() => {
+              console.error('Error committing transaction:', err);
+              req.flash('error', 'Failed to complete delete operation.');
+              res.redirect('/admin/categories');
+            });
+          }
+
+          req.flash('success', 'Category and related products deleted successfully.');
+          res.redirect('/admin/categories');
+        });
+      });
+    });
   });
 });
 

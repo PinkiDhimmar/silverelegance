@@ -13,6 +13,7 @@ const path = require('path');
 const app = express();
 const conn = require('./dbConfig');
 
+const flash = require('connect-flash');
 require('dotenv').config();
 
 // Multer setup for image uploads
@@ -39,6 +40,7 @@ app.use(session({
   cookie: { maxAge: 86400000 } // 1 day
 }));
 
+app.use(flash());
 // Static assets
 app.use('/public', express.static('public'));
 app.use('/uploads', express.static('uploads'));
@@ -48,6 +50,14 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 //Make conn available in all routes
 app.use((req, res, next) => {
   req.conn = conn; // ✅ Make conn available in all routes
+  next();
+});
+// Make flash messages available in all views (optional, if you use EJS etc.)
+app.use((req, res, next) => {
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
+  delete req.session.success;
+  delete req.session.error;
   next();
 });
 // Pass session and user to all views
