@@ -142,6 +142,11 @@
   transform: scale(1.1) !important;
   filter: brightness(0.8) !important;
 }
+.cf .card-title {
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  color: #B32748 !important;
+}
 /* New Products */
 .product-scroll {
   -ms-overflow-style: none;  /* IE and Edge */
